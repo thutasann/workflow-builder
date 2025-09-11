@@ -118,7 +118,7 @@ const WorkflowCanvasContent: React.FC = () => {
         nodeTypes={apNodeTypes}
         edgeTypes={apEdgeTypes}
         defaultEdgeOptions={{
-          type: 'straightLine',
+          type: ApEdgeType.STRAIGHT_LINE,
           animated: false,
         }}
         nodesDraggable={false}

@@ -1,4 +1,4 @@
-import { BaseEdge, type EdgeProps } from '@xyflow/react'
+import { BaseEdge, getStraightPath, type EdgeProps } from '@xyflow/react'
 import React from 'react'
 
 import { useWorkflow } from '../../context/WorkflowContext'
@@ -39,13 +39,13 @@ export const ApStraightLineEdge = ({
 }: EdgeProps & Omit<ApStraightLineEdgeType, 'id' | 'source' | 'target' | 'type'>) => {
   const { addAction } = useWorkflow()
   
-  // Calculate path for vertical line
-  const path = `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`
-  
-  // Add arrow at the end if specified
-  const pathWithArrow = data.drawArrowHead
-    ? `${path} ${flowConstants.ARROW_DOWN}`
-    : path
+  // Use React Flow's getStraightPath for proper straight line rendering
+  const [edgePath] = getStraightPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  })
   
   // Calculate middle point for add button
   const midX = sourceX + (targetX - sourceX) / 2
@@ -66,7 +66,7 @@ export const ApStraightLineEdge = ({
   return (
     <>
       <BaseEdge
-        path={pathWithArrow}
+        path={edgePath}
         style={{ 
           strokeWidth: `${flowConstants.LINE_WIDTH}px`,
           stroke: '#6b7280'

@@ -89,23 +89,29 @@ const createStepGraph = (step: FlowAction | FlowTrigger, graphHeight: number): A
     selectable: false,
   }
 
-  const straightLineEdge: ApStraightLineEdge = {
-    id: `${step.name}-${step.nextAction?.name ?? 'graph-end'}-edge`,
-    source: step.name,
-    target: `${step.name}-subgraph-end`,
-    type: ApEdgeType.STRAIGHT_LINE,
-    data: {
-      drawArrowHead: !!step.nextAction,
-      parentStepName: step.name,
-    },
+  // Only create edge to graph end if there's no nextAction
+  const edges: ApStraightLineEdge[] = []
+  
+  if (step.type !== FlowActionType.LOOP_ON_ITEMS && step.type !== FlowActionType.ROUTER) {
+    if (!step.nextAction) {
+      // Create edge to graph end only if this is the last step
+      const straightLineEdge: ApStraightLineEdge = {
+        id: `${step.name}-graph-end-edge`,
+        source: step.name,
+        target: `${step.name}-subgraph-end`,
+        type: ApEdgeType.STRAIGHT_LINE,
+        data: {
+          drawArrowHead: false,
+          parentStepName: step.name,
+        },
+      }
+      edges.push(straightLineEdge)
+    }
   }
 
   return {
     nodes: [stepNode, graphEndNode],
-    edges:
-      step.type !== FlowActionType.LOOP_ON_ITEMS && step.type !== FlowActionType.ROUTER
-        ? [straightLineEdge]
-        : [],
+    edges,
   }
 }
 
@@ -241,6 +247,20 @@ const offsetRouterChildSteps = (childGraphs: ApGraph[]): ApGraph[] => {
   })
 }
 
+// Create edge between two sequential steps
+const createInterStepEdge = (currentStep: FlowAction | FlowTrigger, nextStep: FlowAction): ApStraightLineEdge => {
+  return {
+    id: `${currentStep.name}-${nextStep.name}-edge`,
+    source: currentStep.name,
+    target: nextStep.name,
+    type: ApEdgeType.STRAIGHT_LINE,
+    data: {
+      drawArrowHead: false,
+      parentStepName: currentStep.name,
+    },
+  }
+}
+
 // Main graph building function (recursive)
 export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph => {
   if (!step) {
@@ -265,13 +285,25 @@ export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph 
   const graphWithChild = childGraph ? mergeGraph(graph, childGraph) : graph
   const nextStepGraph = buildGraph(step.nextAction)
 
-  return mergeGraph(
+  // Create edge between current step and next step if nextAction exists
+  const interStepEdges: ApStraightLineEdge[] = []
+  if (step.nextAction && step.type !== FlowActionType.LOOP_ON_ITEMS && step.type !== FlowActionType.ROUTER) {
+    interStepEdges.push(createInterStepEdge(step, step.nextAction))
+  }
+
+  const mergedGraph = mergeGraph(
     graphWithChild,
     offsetGraph(nextStepGraph, {
       x: 0,
       y: calculateGraphBoundingBox(graphWithChild).height,
     }),
   )
+
+  // Add inter-step edges
+  return {
+    nodes: mergedGraph.nodes,
+    edges: [...mergedGraph.edges, ...interStepEdges],
+  }
 }
 
 // Convert FlowVersion to graph (main entry point)
