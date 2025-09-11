@@ -136,46 +136,6 @@ npm run type-check # Run TypeScript compiler
 - **Vite 6.0** - Build tooling
 - **Context API** - State management
 
-## 📋 Roadmap
-
-### Phase 1 ✅ (Completed)
-
-- [x] Basic workflow visualization
-- [x] Custom node components
-- [x] Edge insertion controls
-- [x] Automatic layout system
-- [x] TypeScript integration
-
-### Phase 2 🚧 (Planned)
-
-- [ ] Node palette/sidebar
-- [ ] Drag and drop support
-- [ ] Connection validation
-- [ ] Node configuration panels
-- [ ] Workflow templates
-
-### Phase 3 🔮 (Future)
-
-- [ ] Workflow execution engine
-- [ ] Import/Export (JSON/YAML)
-- [ ] Undo/Redo functionality
-- [ ] Keyboard shortcuts
-- [ ] Collaborative editing
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read the contributing guidelines before submitting PRs.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🙏 Acknowledgments
 
 - Inspired by [ActivePieces](https://www.activepieces.com/)
@@ -190,4 +150,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by Thuta
