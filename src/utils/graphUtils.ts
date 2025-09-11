@@ -82,7 +82,7 @@ const createStepGraph = (step: FlowAction | FlowTrigger, graphHeight: number): A
     id: `${step.name}-subgraph-end`,
     type: ApNodeType.GRAPH_END_WIDGET,
     position: {
-      x: 400 + flowConstants.AP_NODE_SIZE.step.width / 2,
+      x: 400 + flowConstants.AP_NODE_SIZE.step.width / 2 - 16, // Center align with step node (assuming end widget is ~32px wide)
       y: 100 + graphHeight,
     },
     data: {},
