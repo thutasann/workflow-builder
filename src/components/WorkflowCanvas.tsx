@@ -1,24 +1,27 @@
-import React, { useCallback, useEffect } from 'react'
 import {
-  ReactFlow,
   Background,
+  BackgroundVariant,
   Controls,
   MiniMap,
-  BackgroundVariant,
+  ReactFlow,
   ReactFlowProvider,
   useReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import React, { useCallback, useEffect } from 'react'
 
 import { useWorkflow } from '../context/WorkflowContext'
-import { TriggerNode } from './nodes/TriggerNode'
-import { ActionNode } from './nodes/ActionNode'
 import { CustomEdge } from './edges/CustomEdge'
+import { ActionNode } from './nodes/ActionNode'
+import { RouterNode } from './nodes/RouterNode'
+import { TriggerNode } from './nodes/TriggerNode'
 import { WorkflowHeader } from './WorkflowHeader'
+import { StepSelectorHandler } from './StepSelectorHandler'
 
 const nodeTypes = {
   trigger: TriggerNode,
   action: ActionNode,
+  router: RouterNode,
 }
 
 const edgeTypes = {
@@ -27,9 +30,6 @@ const edgeTypes = {
 
 const WorkflowCanvasContent: React.FC = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setSelectedNode, setSelectedEdge } = useWorkflow()
-
-  console.log('nodes ==> ', nodes)
-  console.log('edges ==> ', edges)
 
   const { setViewport } = useReactFlow()
 
@@ -61,6 +61,7 @@ const WorkflowCanvasContent: React.FC = () => {
   return (
     <div style={{ width: '100%', height: '100vh', background: '#fafafa', position: 'relative' }}>
       <WorkflowHeader />
+      <StepSelectorHandler />
       <ReactFlow
         nodes={nodes}
         edges={edges}

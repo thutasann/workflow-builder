@@ -7,6 +7,12 @@ interface WorkflowContextType {
   edges: WorkflowEdge[]
   selectedNode: string | null
   selectedEdge: string | null
+  stepSelectorState: {
+    isOpen: boolean
+    position: { x: number; y: number }
+    sourceId: string | null
+    targetId: string | null
+  }
   onNodesChange: (changes: NodeChange[]) => void
   onEdgesChange: (changes: EdgeChange[]) => void
   onConnect: (connection: Connection) => void
@@ -16,6 +22,8 @@ interface WorkflowContextType {
   setSelectedNode: (nodeId: string | null) => void
   setSelectedEdge: (edgeId: string | null) => void
   clearWorkflow: () => void
+  openStepSelector: (sourceId: string, targetId: string, position: { x: number; y: number }) => void
+  closeStepSelector: () => void
 }
 
 const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined)
@@ -38,6 +46,13 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     edges: [],
     selectedNode: null,
     selectedEdge: null,
+  })
+  
+  const [stepSelectorState, setStepSelectorState] = useState({
+    isOpen: false,
+    position: { x: 0, y: 0 },
+    sourceId: null as string | null,
+    targetId: null as string | null,
   })
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -129,11 +144,30 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     })
   }, [])
 
+  const openStepSelector = useCallback((sourceId: string, targetId: string, position: { x: number; y: number }) => {
+    setStepSelectorState({
+      isOpen: true,
+      position,
+      sourceId,
+      targetId,
+    })
+  }, [])
+
+  const closeStepSelector = useCallback(() => {
+    setStepSelectorState({
+      isOpen: false,
+      position: { x: 0, y: 0 },
+      sourceId: null,
+      targetId: null,
+    })
+  }, [])
+
   const contextValue: WorkflowContextType = {
     nodes: state.nodes,
     edges: state.edges,
     selectedNode: state.selectedNode,
     selectedEdge: state.selectedEdge,
+    stepSelectorState,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -143,6 +177,8 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     setSelectedNode,
     setSelectedEdge,
     clearWorkflow,
+    openStepSelector,
+    closeStepSelector,
   }
 
   return <WorkflowContext.Provider value={contextValue}>{children}</WorkflowContext.Provider>
