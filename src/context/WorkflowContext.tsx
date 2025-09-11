@@ -1,12 +1,29 @@
 import { applyEdgeChanges, applyNodeChanges, type Connection, type EdgeChange, type NodeChange } from '@xyflow/react'
-import React, { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
-import type { WorkflowEdge, WorkflowNode, WorkflowState } from '../types/workflow.types'
+import React, { createContext, useCallback, useContext, useState, useMemo, type ReactNode } from 'react'
+import type { 
+  WorkflowEdge, 
+  WorkflowNode, 
+  WorkflowState,
+  FlowVersion,
+  FlowTrigger,
+  FlowAction,
+  ApGraph
+} from '../types/workflow.types'
+import { FlowTriggerType } from '../types/workflow.types'
+import { convertFlowVersionToGraph } from '../utils/graphUtils'
 
 interface WorkflowContextType {
+  // Graph-based state
+  flowVersion: FlowVersion
+  graph: ApGraph
+  selectedStep: string | null
+  
+  // Legacy support
   nodes: WorkflowNode[]
   edges: WorkflowEdge[]
   selectedNode: string | null
   selectedEdge: string | null
+  
   stepSelectorState: {
     isOpen: boolean
     position: { x: number; y: number }
@@ -14,6 +31,15 @@ interface WorkflowContextType {
     targetId: string | null
     sourceHandle?: string | null
   }
+  
+  // Graph operations
+  addAction: (parentStepName: string, action: FlowAction) => void
+  addTrigger: (trigger: FlowTrigger) => void
+  updateStep: (stepName: string, updates: Partial<FlowAction | FlowTrigger>) => void
+  deleteStep: (stepName: string) => void
+  selectStep: (stepName: string | null) => void
+  
+  // Legacy operations
   onNodesChange: (changes: NodeChange[]) => void
   onEdgesChange: (changes: EdgeChange[]) => void
   onConnect: (connection: Connection) => void
@@ -41,7 +67,36 @@ interface WorkflowProviderProps {
   children: ReactNode
 }
 
+// Create initial empty trigger
+const createEmptyTrigger = (): FlowTrigger => ({
+  name: 'trigger',
+  displayName: 'Start',
+  type: FlowTriggerType.EMPTY,
+  settings: {},
+})
+
+// Create initial flow version
+const createInitialFlowVersion = (): FlowVersion => ({
+  id: 'flow-1',
+  trigger: createEmptyTrigger(),
+  version: 1,
+})
+
 export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) => {
+  const [flowVersion, setFlowVersion] = useState<FlowVersion>(createInitialFlowVersion())
+  const [selectedStep, setSelectedStep] = useState<string | null>(null)
+  
+  // Generate graph from flow version (memoized to prevent infinite loops)
+  const graph = useMemo(() => {
+    try {
+      return convertFlowVersionToGraph(flowVersion.trigger)
+    } catch (error) {
+      console.error('Error generating graph:', error)
+      return { nodes: [], edges: [] }
+    }
+  }, [flowVersion.trigger])
+  
+  // Legacy state for backward compatibility
   const [state, setState] = useState<WorkflowState>({
     nodes: [],
     edges: [],
@@ -140,6 +195,8 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
   }, [])
 
   const clearWorkflow = useCallback(() => {
+    setFlowVersion(createInitialFlowVersion())
+    setSelectedStep(null)
     setState({
       nodes: [],
       edges: [],
@@ -170,9 +227,94 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     })
   }, [])
 
+  // Graph-based operations
+  const addAction = useCallback((parentStepName: string, action: FlowAction) => {
+    setFlowVersion((prev) => {
+      // Find the parent step and add the action as nextAction
+      const updateStep = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger => {
+        if (step.name === parentStepName) {
+          return { ...step, nextAction: action }
+        }
+        if ('nextAction' in step && step.nextAction) {
+          return { ...step, nextAction: updateStep(step.nextAction) as FlowAction }
+        }
+        return step
+      }
+      
+      return {
+        ...prev,
+        trigger: updateStep(prev.trigger) as FlowTrigger,
+      }
+    })
+  }, [])
+  
+  const addTrigger = useCallback((trigger: FlowTrigger) => {
+    setFlowVersion((prev) => ({
+      ...prev,
+      trigger,
+    }))
+  }, [])
+  
+  const updateStep = useCallback((stepName: string, updates: Partial<FlowAction | FlowTrigger>) => {
+    setFlowVersion((prev) => {
+      const updateStepRecursive = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger => {
+        if (step.name === stepName) {
+          return { ...step, ...updates }
+        }
+        if ('nextAction' in step && step.nextAction) {
+          return { ...step, nextAction: updateStepRecursive(step.nextAction) as FlowAction }
+        }
+        return step
+      }
+      
+      return {
+        ...prev,
+        trigger: updateStepRecursive(prev.trigger) as FlowTrigger,
+      }
+    })
+  }, [])
+  
+  const deleteStep = useCallback((stepName: string) => {
+    setFlowVersion((prev) => {
+      const deleteStepRecursive = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger | undefined => {
+        if ('nextAction' in step && step.nextAction?.name === stepName) {
+          return { ...step, nextAction: step.nextAction.nextAction }
+        }
+        if ('nextAction' in step && step.nextAction) {
+          const updatedNext = deleteStepRecursive(step.nextAction)
+          return { ...step, nextAction: updatedNext as FlowAction }
+        }
+        return step
+      }
+      
+      const updatedTrigger = deleteStepRecursive(prev.trigger) as FlowTrigger
+      return {
+        ...prev,
+        trigger: updatedTrigger,
+      }
+    })
+  }, [])
+  
+  const selectStep = useCallback((stepName: string | null) => {
+    setSelectedStep(stepName)
+  }, [])
+  
   const contextValue: WorkflowContextType = {
-    nodes: state.nodes,
-    edges: state.edges,
+    // Graph-based state
+    flowVersion,
+    graph,
+    selectedStep,
+    
+    // Graph operations
+    addAction,
+    addTrigger,
+    updateStep,
+    deleteStep,
+    selectStep,
+    
+    // Legacy support
+    nodes: graph.nodes as unknown as WorkflowNode[],
+    edges: graph.edges as unknown as WorkflowEdge[],
     selectedNode: state.selectedNode,
     selectedEdge: state.selectedEdge,
     stepSelectorState,

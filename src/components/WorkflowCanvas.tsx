@@ -8,12 +8,20 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import { useWorkflow } from '../context/WorkflowContext'
+import { ApNodeType, ApEdgeType } from '../types/workflow.types'
+import { convertApGraphToReactFlow } from '../utils/reactFlowConverter'
+
+// New ActivePieces-style components
+import { ApStepNode } from './nodes/ApStepNode'
+import { ApBigAddButtonNode } from './nodes/ApBigAddButtonNode'
+import { ApGraphEndNode } from './nodes/ApGraphEndNode'
+import { ApStraightLineEdge } from './edges/ApStraightLineEdge'
+
+// Legacy components for backward compatibility
 import { CustomEdge } from './edges/CustomEdge'
-import { CustomBranchEdge } from './edges/CustomBranchEdge'
-import { MergeEdge } from './edges/MergeEdge'
 import { ActionNode } from './nodes/ActionNode'
 import { RouterNode } from './nodes/RouterNode'
 import { TriggerNode } from './nodes/TriggerNode'
@@ -22,7 +30,12 @@ import { BranchLabelNode } from './nodes/BranchLabelNode'
 import { WorkflowHeader } from './WorkflowHeader'
 import { StepSelectorHandler } from './StepSelectorHandler'
 
-const nodeTypes = {
+// ActivePieces-style node and edge types
+const apNodeTypes = {
+  [ApNodeType.STEP]: ApStepNode,
+  [ApNodeType.BIG_ADD_BUTTON]: ApBigAddButtonNode,
+  [ApNodeType.GRAPH_END_WIDGET]: ApGraphEndNode,
+  // Legacy support
   trigger: TriggerNode,
   action: ActionNode,
   router: RouterNode,
@@ -30,14 +43,33 @@ const nodeTypes = {
   branchLabel: BranchLabelNode,
 }
 
-const edgeTypes = {
+const apEdgeTypes = {
+  [ApEdgeType.STRAIGHT_LINE]: ApStraightLineEdge,
+  // Legacy support
   custom: CustomEdge,
-  branch: CustomBranchEdge,
-  merge: MergeEdge,
 }
 
 const WorkflowCanvasContent: React.FC = () => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setSelectedNode, setSelectedEdge } = useWorkflow()
+  const { 
+    graph, 
+    selectStep,
+    // Legacy support
+    onNodesChange, 
+    onEdgesChange, 
+    onConnect, 
+    setSelectedNode, 
+    setSelectedEdge 
+  } = useWorkflow()
+  
+  // Convert our graph to React Flow format (memoized to prevent infinite loops)
+  const { nodes, edges } = useMemo(() => {
+    try {
+      return convertApGraphToReactFlow(graph)
+    } catch (error) {
+      console.error('Failed to convert graph to React Flow format:', error)
+      return { nodes: [], edges: [] }
+    }
+  }, [graph])
 
   const { setViewport } = useReactFlow()
 
@@ -47,10 +79,13 @@ const WorkflowCanvasContent: React.FC = () => {
 
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: any) => {
+      // Use new graph-based selection
+      selectStep(node.id)
+      // Legacy support
       setSelectedNode(node.id)
       setSelectedEdge(null)
     },
-    [setSelectedNode, setSelectedEdge]
+    [selectStep, setSelectedNode, setSelectedEdge]
   )
 
   const onEdgeClick = useCallback(
@@ -62,9 +97,10 @@ const WorkflowCanvasContent: React.FC = () => {
   )
 
   const onPaneClick = useCallback(() => {
+    selectStep(null)
     setSelectedNode(null)
     setSelectedEdge(null)
-  }, [setSelectedNode, setSelectedEdge])
+  }, [selectStep, setSelectedNode, setSelectedEdge])
 
   return (
     <div style={{ width: '100%', height: '100vh', background: '#fafafa', position: 'relative' }}>
@@ -79,14 +115,14 @@ const WorkflowCanvasContent: React.FC = () => {
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
         onPaneClick={onPaneClick}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        nodeTypes={apNodeTypes}
+        edgeTypes={apEdgeTypes}
         defaultEdgeOptions={{
-          type: 'custom',
+          type: 'straightLine',
           animated: false,
         }}
         nodesDraggable={false}
-        nodesConnectable={true}
+        nodesConnectable={false}
         elementsSelectable={true}
         fitView
         fitViewOptions={{
