@@ -27,6 +27,8 @@ interface WorkflowContextType {
   stepSelectorState: {
     isOpen: boolean
     position: { x: number; y: number }
+    parentStepName: string | null
+    // Legacy support
     sourceId: string | null
     targetId: string | null
     sourceHandle?: string | null
@@ -50,6 +52,7 @@ interface WorkflowContextType {
   setSelectedEdge: (edgeId: string | null) => void
   clearWorkflow: () => void
   openStepSelector: (sourceId: string, targetId: string, position: { x: number; y: number }, sourceHandle?: string | null) => void
+  openStepSelectorForStep: (parentStepName: string, position: { x: number; y: number }) => void
   closeStepSelector: () => void
 }
 
@@ -109,6 +112,8 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
   const [stepSelectorState, setStepSelectorState] = useState({
     isOpen: false,
     position: { x: 0, y: 0 },
+    parentStepName: null as string | null,
+    // Legacy support
     sourceId: null as string | null,
     targetId: null as string | null,
     sourceHandle: null as string | null | undefined,
@@ -211,9 +216,22 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     setStepSelectorState({
       isOpen: true,
       position,
+      parentStepName: null, // Legacy method doesn't use parentStepName
       sourceId,
       targetId,
       sourceHandle: sourceHandle || null,
+    })
+  }, [])
+
+  const openStepSelectorForStep = useCallback((parentStepName: string, position: { x: number; y: number }) => {
+    setStepSelectorState({
+      isOpen: true,
+      position,
+      parentStepName,
+      // Legacy support
+      sourceId: null,
+      targetId: null,
+      sourceHandle: null,
     })
   }, [])
 
@@ -221,6 +239,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     setStepSelectorState({
       isOpen: false,
       position: { x: 0, y: 0 },
+      parentStepName: null,
       sourceId: null,
       targetId: null,
       sourceHandle: null,
@@ -328,6 +347,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     setSelectedEdge,
     clearWorkflow,
     openStepSelector,
+    openStepSelectorForStep,
     closeStepSelector,
   }
 

@@ -37,7 +37,7 @@ export const ApStraightLineEdge = ({
   targetY,
   data,
 }: EdgeProps & Omit<ApStraightLineEdgeType, 'id' | 'source' | 'target' | 'type'>) => {
-  const { addAction } = useWorkflow()
+  const { openStepSelectorForStep } = useWorkflow()
   
   // Use React Flow's getStraightPath for proper straight line rendering
   const [edgePath] = getStraightPath({
@@ -52,15 +52,11 @@ export const ApStraightLineEdge = ({
   const midY = sourceY + (targetY - sourceY) / 2
   
   const handleAddStep = () => {
-    // Create a new action step
-    const newAction = {
-      name: `step-${Date.now()}`,
-      displayName: 'New Step',
-      type: 'CODE' as any, // Will be updated to proper enum
-      settings: {},
-    }
-    
-    addAction(data.parentStepName, newAction)
+    // Open step selector popup at the button location
+    openStepSelectorForStep(data.parentStepName, {
+      x: midX,
+      y: midY,
+    })
   }
   
   return (
