@@ -1,6 +1,5 @@
 import { BaseEdge, EdgeLabelRenderer, type EdgeProps, getStraightPath } from '@xyflow/react'
 import React from 'react'
-import { useWorkflow } from '../../context/WorkflowContext'
 
 export const CustomEdge: React.FC<EdgeProps> = ({
   id,
@@ -14,9 +13,6 @@ export const CustomEdge: React.FC<EdgeProps> = ({
   targetPosition,
   markerEnd,
 }) => {
-  // const { setNodes, setEdges, getNodes } = useReactFlow()
-  const { openStepSelector } = useWorkflow()
-
   const [edgePath, labelX, labelY] = getStraightPath({
     sourceX,
     sourceY,
@@ -26,7 +22,7 @@ export const CustomEdge: React.FC<EdgeProps> = ({
 
   const handlePlusClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    openStepSelector(source, target, { x: e.clientX, y: e.clientY })
+    // TODO: Implement add action functionality
   }
 
   return (

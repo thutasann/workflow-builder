@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
+import { FlowActionType } from '../types/workflow.types'
 
 interface StepOption {
   id: string
-  type: 'action' | 'router'
+  type: FlowActionType
   label: string
   icon: string
   category: string
@@ -21,7 +22,7 @@ const stepOptions: StepOption[] = [
   // Popular integrations
   {
     id: 'google-sheets',
-    type: 'action',
+    type: FlowActionType.PIECE,
     label: 'Google Sheets',
     icon: '📊',
     category: 'Popular',
@@ -29,7 +30,7 @@ const stepOptions: StepOption[] = [
   },
   {
     id: 'slack',
-    type: 'action',
+    type: FlowActionType.PIECE,
     label: 'Slack',
     icon: '💬',
     category: 'Popular',
@@ -37,7 +38,7 @@ const stepOptions: StepOption[] = [
   },
   {
     id: 'notion',
-    type: 'action',
+    type: FlowActionType.PIECE,
     label: 'Notion',
     icon: '📝',
     category: 'Popular',
@@ -45,7 +46,7 @@ const stepOptions: StepOption[] = [
   },
   {
     id: 'gmail',
-    type: 'action',
+    type: FlowActionType.PIECE,
     label: 'Gmail',
     icon: '📧',
     category: 'Popular',
@@ -53,7 +54,7 @@ const stepOptions: StepOption[] = [
   },
   {
     id: 'hubspot',
-    type: 'action',
+    type: FlowActionType.PIECE,
     label: 'HubSpot',
     icon: '🎯',
     category: 'Popular',
@@ -63,17 +64,17 @@ const stepOptions: StepOption[] = [
   // Utility nodes
   {
     id: 'router',
-    type: 'router',
+    type: FlowActionType.ROUTER,
     label: 'Router',
     icon: '🔀',
     category: 'Highlights',
     description: 'Route to multiple branches',
   },
-  { id: 'http', type: 'action', label: 'HTTP', icon: '🌐', category: 'Highlights', description: 'Make HTTP requests' },
-  { id: 'code', type: 'action', label: 'Code', icon: '💻', category: 'Highlights', description: 'Run custom code' },
+  { id: 'http', type: FlowActionType.CODE, label: 'HTTP', icon: '🌐', category: 'Highlights', description: 'Make HTTP requests' },
+  { id: 'code', type: FlowActionType.CODE, label: 'Code', icon: '💻', category: 'Highlights', description: 'Run custom code' },
   {
     id: 'tables',
-    type: 'action',
+    type: FlowActionType.PIECE,
     label: 'Tables',
     icon: '📊',
     category: 'Highlights',

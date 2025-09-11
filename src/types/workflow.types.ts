@@ -1,4 +1,3 @@
-import type { Node, Edge, NodeProps } from '@xyflow/react'
 
 // ActivePieces-inspired Node Types
 export enum ApNodeType {
@@ -194,41 +193,3 @@ export interface BoundingBox {
   bottom: number
 }
 
-// Legacy types for backward compatibility
-export type NodeType = 'trigger' | 'action' | 'router' | 'branch' | 'endConnector' | 'branchLabel'
-
-export interface WorkflowNodeData {
-  label: string
-  type: NodeType
-  icon?: string
-  description?: string
-  config?: Record<string, any>
-  integrationLogo?: string
-  integrationName?: string
-  stepNumber?: string
-  branchId?: string
-  [key: string]: any
-}
-
-export type WorkflowNode = Node<WorkflowNodeData, NodeType>
-
-export type WorkflowEdge = Edge<{
-  label?: string
-  condition?: any
-  branchId?: string
-  branchCondition?: string
-  branchLabel?: string
-  branchIndex?: number
-  isOtherwiseBranch?: boolean
-}>
-
-export interface WorkflowState {
-  nodes: WorkflowNode[]
-  edges: WorkflowEdge[]
-  selectedNode: string | null
-  selectedEdge: string | null
-  branches: Map<string, any>
-  nodePositions: Map<string, any>
-}
-
-export type CustomNodeProps = NodeProps<WorkflowNode>

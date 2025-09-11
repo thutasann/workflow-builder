@@ -1,199 +1,246 @@
 # Workflow Builder Documentation
 
-A React-based visual workflow builder inspired by ActivePieces, built with React Flow (xyflow).
+A React-based visual workflow builder inspired by ActivePieces, built with React Flow (@xyflow/react) using a graph-based architecture.
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Architecture](#architecture)
-- [Getting Started](#getting-started)
+- [ActivePieces Architecture](#activepieces-architecture)
+- [Key Concepts](#key-concepts)
 - [Components](#components)
-- [Usage](#usage)
+- [Graph System](#graph-system)
 - [API Reference](#api-reference)
+- [Implementation Guide](#implementation-guide)
 
 ## Overview
 
-This workflow builder allows users to create visual automation workflows with a drag-and-drop interface. It features:
+This workflow builder implements ActivePieces' graph-based architecture for creating visual automation workflows. Key features:
 
-- **Trigger nodes** - Starting points for workflows (e.g., Slack messages, webhooks)
-- **Action nodes** - Operations to perform (e.g., create database items, send notifications)
-- **Visual connections** - Straight-line edges with inline controls
-- **Non-draggable nodes** - Fixed vertical layout for clean organization
-- **Dynamic node insertion** - Add nodes between existing ones with plus buttons
+- **Graph-Based State** - Workflows represented as FlowVersion with recursive structure
+- **ActivePieces Node Types** - ApStepNode, ApBigAddButtonNode, ApGraphEndNode
+- **Straight-Line Edges** - All connections use ApStraightLineEdge with inline controls
+- **Automatic Layout** - Graph building with proper offsets and spacing
+- **Step Selector Popup** - Beautiful UI for adding integrations and actions
+- **Router Support** - Create branching workflows with conditional logic
 
-## Architecture
+## ActivePieces Architecture
 
-The project follows a component-based architecture with global state management:
+The project follows ActivePieces' graph-based architecture:
 
 ```
 src/
 ├── components/
 │   ├── nodes/
-│   │   ├── TriggerNode.tsx    # Trigger node component
-│   │   └── ActionNode.tsx     # Action node component
+│   │   ├── ApStepNode.tsx        # Main step component for triggers/actions
+│   │   ├── ApBigAddButtonNode.tsx # Large button for empty branches
+│   │   └── ApGraphEndNode.tsx    # Graph termination widget
 │   ├── edges/
-│   │   └── CustomEdge.tsx     # Custom edge with plus button
-│   ├── WorkflowCanvas.tsx     # Main canvas component
-│   └── WorkflowHeader.tsx     # Header with workflow name
+│   │   └── ApStraightLineEdge.tsx # Straight edges with add buttons
+│   ├── WorkflowCanvas.tsx        # React Flow canvas
+│   ├── StepSelector.tsx          # Integration selector popup
+│   └── StepSelectorHandler.tsx   # Step selector logic
 ├── context/
-│   └── WorkflowContext.tsx    # Global state management
+│   └── WorkflowContext.tsx       # Graph-based state management
 ├── types/
-│   └── workflow.types.ts      # TypeScript definitions
-└── App.tsx                    # Main application component
+│   └── workflow.types.ts         # ActivePieces-style types
+├── utils/
+│   ├── graphUtils.ts             # Graph building functions
+│   ├── reactFlowConverter.ts     # ApGraph to React Flow
+│   └── flowConstants.ts          # Dimensions and constants
+└── App.tsx                       # Main application
 ```
 
-## Getting Started
+## Key Concepts
 
-### Installation
-
-```bash
-npm install
+### FlowVersion Structure
+```typescript
+interface FlowVersion {
+  displayName: string
+  trigger: FlowTrigger
+  valid: boolean
+  updated: string
+}
 ```
 
-### Development
-
-```bash
-npm run dev
+### ApGraph System
+```typescript
+interface ApGraph {
+  nodes: ApNode[]
+  edges: ApEdge[]
+}
 ```
 
-### Key Dependencies
-
-- `@xyflow/react` - React Flow library for workflow visualization
-- `react` - UI framework
-- `typescript` - Type safety
-- `vite` - Build tool
+### Flow Action Types
+```typescript
+enum FlowActionType {
+  CODE = 'CODE',
+  PIECE = 'PIECE',
+  LOOP_ON_ITEMS = 'LOOP_ON_ITEMS',
+  ROUTER = 'ROUTER'
+}
+```
 
 ## Components
 
 ### Node Components
 
-#### TriggerNode
+#### ApStepNode
+The main workflow step component (260x70px):
+- Renders both triggers and actions
+- Shows icon, title, and subtitle
+- Dropdown menu for step options
+- Handles for edge connections
 
-The starting point of any workflow. Features:
+#### ApBigAddButtonNode
+Large add button for empty branches:
+- Used in router branches
+- Centered plus icon
+- Opens step selector on click
 
-- Step number "1"
-- Integration logo and name
-- Bottom handle for connections
-- Purple accent color
-
-#### ActionNode
-
-Represents workflow actions. Features:
-
-- Sequential step numbering (2, 3, 4...)
-- Integration logo and name
-- Top and bottom handles
-- Gray styling
+#### ApGraphEndNode
+Graph termination point:
+- Usually invisible (0x0 size)
+- Shows flag icon when `showWidget` is true
+- Used for layout calculations
 
 ### Edge Component
 
-#### CustomEdge
+#### ApStraightLineEdge
+Straight-line connections with:
+- Inline plus button at midpoint
+- Uses React Flow's getStraightPath
+- Opens step selector popup on click
+- Configurable button visibility
 
-Straight-line connections between nodes with:
+### Step Selector
 
-- Plus button for inserting new nodes
-- Custom styling with gray color scheme
-- Automatic edge type assignment
+#### StepSelector & StepSelectorHandler
+- Modal popup for choosing actions
+- Categorized tabs (Explore/Apps/Utility)
+- Search functionality
+- Maps selections to FlowActionType
 
-### Canvas Component
+## Graph System
 
-#### WorkflowCanvas
+### Building Process
 
-Main container that:
-
-- Renders nodes and edges
-- Handles user interactions
-- Provides zoom/pan controls
-- Shows minimap
-- Dot-pattern background
-
-## Usage
-
-### Basic Workflow Creation
-
-1. **Initial State**: The workflow starts with a trigger node
-2. **Add Actions**: Click the plus button on edges to insert action nodes
-3. **Automatic Layout**: Nodes maintain 200px vertical spacing
-4. **Step Numbering**: Automatically updates as nodes are added
-
-### Context API
-
-The `WorkflowContext` provides global state management:
+The graph is built recursively using `buildGraph()`:
 
 ```typescript
-const {
-  nodes, // Current nodes array
-  edges, // Current edges array
-  addNode, // Add a new node
-  onConnect, // Connect two nodes
-  deleteNode, // Remove a node
-  updateNode, // Update node data
-  // ... other methods
-} = useWorkflow()
-```
-
-### Node Structure
-
-```typescript
-interface WorkflowNode {
-  id: string
-  type: 'trigger' | 'action'
-  position: { x: number; y: number }
-  data: {
-    label: string
-    type: NodeType
-    stepNumber?: string
-    integrationName?: string
-    integrationLogo?: string
-  }
+function buildGraph(step: FlowAction | FlowTrigger): ApGraph {
+  // 1. Create step graph
+  const graph = createStepGraph(step, height)
+  
+  // 2. Build child graphs (for routers/loops)
+  const childGraph = buildRouterChildGraph(step)
+  
+  // 3. Build next step graph
+  const nextGraph = buildGraph(step.nextAction)
+  
+  // 4. Merge with proper offsets
+  return mergeGraph(graph, offsetGraph(nextGraph, offset))
 }
 ```
 
-## Features
+### Graph Utilities
 
-### Phase 1 (Completed) ✓
+- **offsetGraph()** - Adjust node/edge positions
+- **mergeGraph()** - Combine multiple graphs
+- **calculateGraphBoundingBox()** - Get graph dimensions
+- **convertFlowVersionToGraph()** - Main entry point
 
-- [x] React Flow integration
-- [x] Custom node components (Trigger, Action)
-- [x] Custom edge with plus button
-- [x] Non-draggable nodes
-- [x] Vertical alignment (400px center)
-- [x] 200px spacing between nodes
-- [x] Step numbering system
-- [x] Duplicate prevention
-- [x] TypeScript support
+### Router Implementation
 
-### Future Phases
+Routers create 4 branches automatically:
+```typescript
+const routerAction: RouterAction = {
+  type: FlowActionType.ROUTER,
+  children: [
+    branch1Action, // Conditional branch 1
+    branch2Action, // Conditional branch 2
+    branch3Action, // Conditional branch 3
+    null          // Otherwise branch
+  ]
+}
+```
 
-- [ ] Node palette/sidebar
-- [ ] Drag and drop from palette
-- [ ] Connection validation
-- [ ] Node configuration panels
-- [ ] Workflow execution
-- [ ] Import/Export functionality
-- [ ] Undo/Redo system
-- [ ] Keyboard shortcuts
+## API Reference
 
-## Best Practices
+### WorkflowContext
 
-1. **State Management**: Use the context API for all workflow modifications
-2. **Node IDs**: Generate unique IDs using timestamps or UUIDs
-3. **Edge Types**: Always use 'custom' type for consistent styling
-4. **Positioning**: Maintain the 400px X-coordinate for vertical alignment
-5. **Spacing**: Keep 200px between nodes for readability
+```typescript
+interface WorkflowContextType {
+  // State
+  flowVersion: FlowVersion
+  graph: ApGraph
+  selectedStep: string | null
+  
+  // Operations
+  addAction(parentStepName: string, action: FlowAction): void
+  addTrigger(trigger: FlowTrigger): void
+  updateStep(stepName: string, updates: Partial<FlowAction | FlowTrigger>): void
+  deleteStep(stepName: string): void
+  selectStep(stepName: string | null): void
+  
+  // UI Controls
+  openStepSelectorForStep(parentStepName: string, position: { x: number; y: number }): void
+  closeStepSelector(): void
+}
+```
 
-## Troubleshooting
+### Adding Actions
 
-### Common Issues
+```typescript
+const newAction: FlowAction = {
+  name: `step-${Date.now()}`,
+  displayName: 'Send Email',
+  type: FlowActionType.PIECE,
+  settings: {
+    pieceName: 'gmail',
+    actionName: 'send-email'
+  },
+  nextAction: undefined
+}
 
-1. **Duplicate Nodes**: The context prevents duplicates by checking IDs
-2. **Missing Plus Buttons**: Ensure edges use type: 'custom'
-3. **Node Ordering**: Nodes are automatically sorted by Y position
-4. **Step Numbers**: Recalculated on every node addition
+addAction('trigger', newAction) // Add after trigger
+```
 
-### Development Tips
+## Implementation Guide
 
-- Use the browser console to inspect node/edge arrays
-- Check React DevTools for context state
-- Verify edge connections in the edges array
-- Monitor node positions for alignment issues
+### Creating a Router
+
+```typescript
+const routerAction = {
+  name: 'router-1',
+  displayName: 'Branch on Condition',
+  type: FlowActionType.ROUTER,
+  settings: {
+    branches: [
+      { condition: 'value > 10' },
+      { condition: 'value < 5' },
+      { condition: 'value == 7' }
+    ]
+  },
+  children: [null, null, null, null]
+}
+```
+
+### Best Practices
+
+1. **Always use context methods** for state changes
+2. **Let the graph rebuild automatically** after changes
+3. **Use proper TypeScript enums** for type safety
+4. **Follow ActivePieces patterns** for consistency
+
+### Troubleshooting
+
+- **Edges not straight?** Check edge type is 'straightLine'
+- **Graph not updating?** Ensure using context methods
+- **Position issues?** Verify graph offset calculations
+- **Missing nodes?** Check graph building recursion
+
+## Links
+
+- [ActivePieces Analysis](./activepieces-analysis.md)
+- [Main README](../README.md)
+- [Screenshots](./screenshots/)

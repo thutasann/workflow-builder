@@ -20,13 +20,8 @@ import { ApBigAddButtonNode } from './nodes/ApBigAddButtonNode'
 import { ApGraphEndNode } from './nodes/ApGraphEndNode'
 import { ApStepNode } from './nodes/ApStepNode'
 
-// Legacy components for backward compatibility
+// Edge components
 import { CustomEdge } from './edges/CustomEdge'
-import { ActionNode } from './nodes/ActionNode'
-import { BranchLabelNode } from './nodes/BranchLabelNode'
-import { EndConnectorNode } from './nodes/EndConnectorNode'
-import { RouterNode } from './nodes/RouterNode'
-import { TriggerNode } from './nodes/TriggerNode'
 import { StepSelectorHandler } from './StepSelectorHandler'
 import { WorkflowHeader } from './WorkflowHeader'
 
@@ -35,17 +30,10 @@ const apNodeTypes = {
   [ApNodeType.STEP]: ApStepNode,
   [ApNodeType.BIG_ADD_BUTTON]: ApBigAddButtonNode,
   [ApNodeType.GRAPH_END_WIDGET]: ApGraphEndNode,
-  // Legacy support
-  trigger: TriggerNode,
-  action: ActionNode,
-  router: RouterNode,
-  endConnector: EndConnectorNode,
-  branchLabel: BranchLabelNode,
 }
 
 const apEdgeTypes = {
   [ApEdgeType.STRAIGHT_LINE]: ApStraightLineEdge,
-  // Legacy support
   custom: CustomEdge,
 }
 
@@ -53,7 +41,6 @@ const WorkflowCanvasContent: React.FC = () => {
   const {
     graph,
     selectStep,
-    // Legacy support
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -79,9 +66,7 @@ const WorkflowCanvasContent: React.FC = () => {
 
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: any) => {
-      // Use new graph-based selection
       selectStep(node.id)
-      // Legacy support
       setSelectedNode(node.id)
       setSelectedEdge(null)
     },
@@ -134,10 +119,7 @@ const WorkflowCanvasContent: React.FC = () => {
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} color='#e5e7eb' />
         <Controls />
         <MiniMap
-          nodeColor={(node) => {
-            if (node.type === 'trigger') return '#6366f1'
-            return '#e5e7eb'
-          }}
+          nodeColor={() => '#e5e7eb'}
           style={{
             background: '#fff',
             border: '1px solid #e5e7eb',

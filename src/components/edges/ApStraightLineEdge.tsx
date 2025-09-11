@@ -2,8 +2,8 @@ import { BaseEdge, getStraightPath, type EdgeProps } from '@xyflow/react'
 import React from 'react'
 
 import { useWorkflow } from '../../context/WorkflowContext'
-import { flowConstants } from '../../utils/flowConstants'
 import type { ApStraightLineEdge as ApStraightLineEdgeType } from '../../types/workflow.types'
+import { flowConstants } from '../../utils/flowConstants'
 
 interface AddButtonProps {
   x: number
