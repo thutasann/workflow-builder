@@ -12,6 +12,7 @@ interface WorkflowContextType {
     position: { x: number; y: number }
     sourceId: string | null
     targetId: string | null
+    sourceHandle?: string | null
   }
   onNodesChange: (changes: NodeChange[]) => void
   onEdgesChange: (changes: EdgeChange[]) => void
@@ -22,7 +23,7 @@ interface WorkflowContextType {
   setSelectedNode: (nodeId: string | null) => void
   setSelectedEdge: (edgeId: string | null) => void
   clearWorkflow: () => void
-  openStepSelector: (sourceId: string, targetId: string, position: { x: number; y: number }) => void
+  openStepSelector: (sourceId: string, targetId: string, position: { x: number; y: number }, sourceHandle?: string | null) => void
   closeStepSelector: () => void
 }
 
@@ -46,6 +47,8 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     edges: [],
     selectedNode: null,
     selectedEdge: null,
+    branches: new Map(),
+    nodePositions: new Map(),
   })
   
   const [stepSelectorState, setStepSelectorState] = useState({
@@ -53,6 +56,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     position: { x: 0, y: 0 },
     sourceId: null as string | null,
     targetId: null as string | null,
+    sourceHandle: null as string | null | undefined,
   })
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -141,15 +145,18 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
       edges: [],
       selectedNode: null,
       selectedEdge: null,
+      branches: new Map(),
+      nodePositions: new Map(),
     })
   }, [])
 
-  const openStepSelector = useCallback((sourceId: string, targetId: string, position: { x: number; y: number }) => {
+  const openStepSelector = useCallback((sourceId: string, targetId: string, position: { x: number; y: number }, sourceHandle?: string | null) => {
     setStepSelectorState({
       isOpen: true,
       position,
       sourceId,
       targetId,
+      sourceHandle: sourceHandle || null,
     })
   }, [])
 
@@ -159,6 +166,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
       position: { x: 0, y: 0 },
       sourceId: null,
       targetId: null,
+      sourceHandle: null,
     })
   }, [])
 

@@ -59,7 +59,7 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
           background: '#9ca3af',
           border: '2px solid #fff',
           bottom: '-6px',
-          left: '30%',
+          left: '20%',
         }}
       />
       <Handle
@@ -72,8 +72,7 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
           background: '#9ca3af',
           border: '2px solid #fff',
           bottom: '-6px',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          left: '40%',
         }}
       />
       <Handle
@@ -86,7 +85,20 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
           background: '#9ca3af',
           border: '2px solid #fff',
           bottom: '-6px',
-          right: '30%',
+          left: '60%',
+        }}
+      />
+      <Handle
+        id="branch-4"
+        type="source"
+        position={Position.Bottom}
+        style={{
+          width: '10px',
+          height: '10px',
+          background: '#9ca3af',
+          border: '2px solid #fff',
+          bottom: '-6px',
+          left: '80%',
         }}
       />
     </div>

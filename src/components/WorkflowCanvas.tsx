@@ -12,9 +12,13 @@ import React, { useCallback, useEffect } from 'react'
 
 import { useWorkflow } from '../context/WorkflowContext'
 import { CustomEdge } from './edges/CustomEdge'
+import { CustomBranchEdge } from './edges/CustomBranchEdge'
+import { MergeEdge } from './edges/MergeEdge'
 import { ActionNode } from './nodes/ActionNode'
 import { RouterNode } from './nodes/RouterNode'
 import { TriggerNode } from './nodes/TriggerNode'
+import { EndConnectorNode } from './nodes/EndConnectorNode'
+import { BranchLabelNode } from './nodes/BranchLabelNode'
 import { WorkflowHeader } from './WorkflowHeader'
 import { StepSelectorHandler } from './StepSelectorHandler'
 
@@ -22,10 +26,14 @@ const nodeTypes = {
   trigger: TriggerNode,
   action: ActionNode,
   router: RouterNode,
+  endConnector: EndConnectorNode,
+  branchLabel: BranchLabelNode,
 }
 
 const edgeTypes = {
   custom: CustomEdge,
+  branch: CustomBranchEdge,
+  merge: MergeEdge,
 }
 
 const WorkflowCanvasContent: React.FC = () => {
@@ -38,7 +46,7 @@ const WorkflowCanvasContent: React.FC = () => {
   }, [setViewport])
 
   const onNodeClick = useCallback(
-    (event: React.MouseEvent, node: any) => {
+    (_event: React.MouseEvent, node: any) => {
       setSelectedNode(node.id)
       setSelectedEdge(null)
     },
@@ -46,7 +54,7 @@ const WorkflowCanvasContent: React.FC = () => {
   )
 
   const onEdgeClick = useCallback(
-    (event: React.MouseEvent, edge: any) => {
+    (_event: React.MouseEvent, edge: any) => {
       setSelectedEdge(edge.id)
       setSelectedNode(null)
     },
