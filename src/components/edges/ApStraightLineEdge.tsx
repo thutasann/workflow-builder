@@ -18,10 +18,10 @@ const AddButton: React.FC<AddButtonProps> = ({ x, y, onAddStep }) => {
       y={y - flowConstants.AP_NODE_SIZE.ADD_BUTTON.height / 2}
       width={flowConstants.AP_NODE_SIZE.ADD_BUTTON.width}
       height={flowConstants.AP_NODE_SIZE.ADD_BUTTON.height}
-      className="overflow-visible"
+      className='overflow-visible'
     >
       <button
-        className="w-full h-full bg-white border-2 border-blue-500 rounded-full flex items-center justify-center text-blue-500 hover:bg-blue-50 transition-colors text-sm font-bold shadow-sm"
+        className='w-full h-full bg-white border-2 border-blue-500 rounded-full flex items-center justify-center text-blue-500 hover:bg-blue-50 transition-colors text-sm font-bold shadow-sm'
         onClick={onAddStep}
       >
         +
@@ -38,7 +38,7 @@ export const ApStraightLineEdge = ({
   data,
 }: EdgeProps & Omit<ApStraightLineEdgeType, 'id' | 'source' | 'target' | 'type'>) => {
   const { openStepSelectorForStep } = useWorkflow()
-  
+
   // Use React Flow's getStraightPath for proper straight line rendering
   const [edgePath] = getStraightPath({
     sourceX,
@@ -46,11 +46,11 @@ export const ApStraightLineEdge = ({
     targetX,
     targetY,
   })
-  
+
   // Calculate middle point for add button
   const midX = sourceX + (targetX - sourceX) / 2
   const midY = sourceY + (targetY - sourceY) / 2
-  
+
   const handleAddStep = () => {
     // Open step selector popup at the button location
     openStepSelectorForStep(data.parentStepName, {
@@ -58,25 +58,19 @@ export const ApStraightLineEdge = ({
       y: midY,
     })
   }
-  
+
   return (
     <>
       <BaseEdge
         path={edgePath}
-        style={{ 
+        style={{
           strokeWidth: `${flowConstants.LINE_WIDTH}px`,
-          stroke: '#6b7280'
+          stroke: '#6b7280',
         }}
       />
-      
+
       {/* Add button in the middle of the edge (if not hidden) */}
-      {!data.hideAddButton && (
-        <AddButton
-          x={midX}
-          y={midY}
-          onAddStep={handleAddStep}
-        />
-      )}
+      {!data.hideAddButton && <AddButton x={midX} y={midY} onAddStep={handleAddStep} />}
     </>
   )
 }

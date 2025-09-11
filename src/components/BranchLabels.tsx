@@ -7,15 +7,10 @@ interface BranchLabelsProps {
 }
 
 export const BranchLabels: React.FC<BranchLabelsProps> = ({ routerNode, branchPositions }) => {
-  const labels = [
-    'Add Customer to Sheet',
-    'Notify Me on Slack', 
-    'Send Email to Customer',
-    'Otherwise'
-  ]
-  
+  const labels = ['Add Customer to Sheet', 'Notify Me on Slack', 'Send Email to Customer', 'Otherwise']
+
   const labelY = routerNode.position.y + 80 // Position below router
-  
+
   return (
     <>
       {branchPositions.slice(0, 3).map((x, index) => (
@@ -40,7 +35,7 @@ export const BranchLabels: React.FC<BranchLabelsProps> = ({ routerNode, branchPo
           {labels[index]}
         </div>
       ))}
-      
+
       {/* Otherwise label positioned differently */}
       {branchPositions.length > 3 && (
         <div

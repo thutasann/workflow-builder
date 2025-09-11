@@ -42,16 +42,15 @@ export const CustomBranchEdge: React.FC<CustomBranchEdgeProps> = ({
 
   return (
     <>
-      <BaseEdge 
-        path={edgePath} 
-        markerEnd={markerEnd} 
-        style={{ 
-          stroke: '#e5e7eb', 
+      <BaseEdge
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          stroke: '#e5e7eb',
           strokeWidth: 2,
         }}
       />
-      
-      
+
       {/* Plus button */}
       <EdgeLabelRenderer>
         <div

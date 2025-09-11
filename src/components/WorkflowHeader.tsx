@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 export const WorkflowHeader: React.FC = () => {
   return (
@@ -15,19 +15,21 @@ export const WorkflowHeader: React.FC = () => {
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
       }}
     >
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '12px',
-        color: '#6b7280',
-        fontSize: '14px',
-        fontWeight: 500
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          color: '#6b7280',
+          fontSize: '14px',
+          fontWeight: 500,
+        }}
+      >
         <span>Test Flow</span>
         <span>⌘</span>
         <span>+</span>
         <span>D</span>
       </div>
     </div>
-  );
-};
+  )
+}

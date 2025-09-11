@@ -20,9 +20,9 @@ export const EndConnectorNode: React.FC<CustomNodeProps> = ({ data }) => {
     >
       {/* Multiple input handles for branches - invisible */}
       <Handle
-        type="target"
+        type='target'
         position={Position.Top}
-        id="branch-1"
+        id='branch-1'
         style={{
           background: 'transparent',
           width: '8px',
@@ -33,9 +33,9 @@ export const EndConnectorNode: React.FC<CustomNodeProps> = ({ data }) => {
         }}
       />
       <Handle
-        type="target"
+        type='target'
         position={Position.Top}
-        id="branch-2"
+        id='branch-2'
         style={{
           background: 'transparent',
           width: '8px',
@@ -46,9 +46,9 @@ export const EndConnectorNode: React.FC<CustomNodeProps> = ({ data }) => {
         }}
       />
       <Handle
-        type="target"
+        type='target'
         position={Position.Top}
-        id="branch-3"
+        id='branch-3'
         style={{
           background: 'transparent',
           width: '8px',
@@ -59,9 +59,9 @@ export const EndConnectorNode: React.FC<CustomNodeProps> = ({ data }) => {
         }}
       />
       <Handle
-        type="target"
+        type='target'
         position={Position.Top}
-        id="branch-4"
+        id='branch-4'
         style={{
           background: 'transparent',
           width: '8px',
@@ -71,19 +71,21 @@ export const EndConnectorNode: React.FC<CustomNodeProps> = ({ data }) => {
           top: '-4px',
         }}
       />
-      
+
       {/* End text */}
-      <span style={{
-        fontSize: '14px',
-        fontWeight: '500',
-        color: '#6b7280',
-      }}>
+      <span
+        style={{
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#6b7280',
+        }}
+      >
         End
       </span>
-      
+
       {/* Single output handle */}
       <Handle
-        type="source"
+        type='source'
         position={Position.Bottom}
         style={{
           background: '#9ca3af',

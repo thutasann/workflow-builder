@@ -1,28 +1,28 @@
-import React from 'react';
-import { useWorkflow } from '../context/WorkflowContext';
-import { StepSelector } from './StepSelector';
-import { FlowActionType } from '../types/workflow.types';
+import React from 'react'
+import { useWorkflow } from '../context/WorkflowContext'
+import { FlowActionType } from '../types/workflow.types'
+import { StepSelector } from './StepSelector'
 
 export const StepSelectorHandler: React.FC = () => {
-  const { stepSelectorState, closeStepSelector, addAction } = useWorkflow();
+  const { stepSelectorState, closeStepSelector, addAction } = useWorkflow()
 
   const handleNodeSelect = (option: any) => {
     if (!stepSelectorState.isOpen || !stepSelectorState.parentStepName) {
-      return;
+      return
     }
 
     // Map the UI option to our FlowAction type
-    let actionType: FlowActionType;
+    let actionType: FlowActionType
     switch (option.id) {
       case 'router':
-        actionType = FlowActionType.ROUTER;
-        break;
+        actionType = FlowActionType.ROUTER
+        break
       case 'code':
       case 'http':
-        actionType = FlowActionType.CODE;
-        break;
+        actionType = FlowActionType.CODE
+        break
       default:
-        actionType = FlowActionType.PIECE; // Default to PIECE for integration actions
+        actionType = FlowActionType.PIECE // Default to PIECE for integration actions
     }
 
     // Create new action
@@ -31,12 +31,12 @@ export const StepSelectorHandler: React.FC = () => {
       displayName: option.label,
       type: actionType,
       settings: {},
-    };
+    }
 
     // Add the action to the workflow
-    addAction(stepSelectorState.parentStepName, newAction);
-    closeStepSelector();
-  };
+    addAction(stepSelectorState.parentStepName, newAction)
+    closeStepSelector()
+  }
 
   return (
     <StepSelector
@@ -45,5 +45,5 @@ export const StepSelectorHandler: React.FC = () => {
       onSelect={handleNodeSelect}
       position={stepSelectorState.position}
     />
-  );
-};
+  )
+}

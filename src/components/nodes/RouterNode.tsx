@@ -1,6 +1,6 @@
-import React from 'react';
-import { Handle, Position } from '@xyflow/react';
-import type { CustomNodeProps } from '../../types/workflow.types';
+import React from 'react'
+import { Handle, Position } from '@xyflow/react'
+import type { CustomNodeProps } from '../../types/workflow.types'
 
 export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
   return (
@@ -17,7 +17,7 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
       }}
     >
       <Handle
-        type="target"
+        type='target'
         position={Position.Top}
         style={{
           width: '10px',
@@ -31,27 +31,27 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <span style={{ fontSize: '24px' }}>🔀</span>
         <div style={{ flex: 1 }}>
-          <div style={{ 
-            fontWeight: 600, 
-            fontSize: '16px', 
-            color: '#1a1a1a',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: '16px',
+              color: '#1a1a1a',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
             <span>{data.stepNumber}.</span>
             <span>Router</span>
           </div>
-          <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
-            Route to multiple branches
-          </div>
+          <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>Route to multiple branches</div>
         </div>
       </div>
 
       {/* Multiple bottom handles for branches */}
       <Handle
-        id="branch-1"
-        type="source"
+        id='branch-1'
+        type='source'
         position={Position.Bottom}
         style={{
           width: '10px',
@@ -63,8 +63,8 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
         }}
       />
       <Handle
-        id="branch-2"
-        type="source"
+        id='branch-2'
+        type='source'
         position={Position.Bottom}
         style={{
           width: '10px',
@@ -76,8 +76,8 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
         }}
       />
       <Handle
-        id="branch-3"
-        type="source"
+        id='branch-3'
+        type='source'
         position={Position.Bottom}
         style={{
           width: '10px',
@@ -89,8 +89,8 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
         }}
       />
       <Handle
-        id="branch-4"
-        type="source"
+        id='branch-4'
+        type='source'
         position={Position.Bottom}
         style={{
           width: '10px',
@@ -102,5 +102,5 @@ export const RouterNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
         }}
       />
     </div>
-  );
-};
+  )
+}

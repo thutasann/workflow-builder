@@ -1,13 +1,13 @@
 import { applyEdgeChanges, applyNodeChanges, type Connection, type EdgeChange, type NodeChange } from '@xyflow/react'
 import React, { createContext, useCallback, useContext, useState, useMemo, type ReactNode } from 'react'
-import type { 
-  WorkflowEdge, 
-  WorkflowNode, 
+import type {
+  WorkflowEdge,
+  WorkflowNode,
   WorkflowState,
   FlowVersion,
   FlowTrigger,
   FlowAction,
-  ApGraph
+  ApGraph,
 } from '../types/workflow.types'
 import { FlowTriggerType } from '../types/workflow.types'
 import { convertFlowVersionToGraph } from '../utils/graphUtils'
@@ -17,13 +17,13 @@ interface WorkflowContextType {
   flowVersion: FlowVersion
   graph: ApGraph
   selectedStep: string | null
-  
+
   // Legacy support
   nodes: WorkflowNode[]
   edges: WorkflowEdge[]
   selectedNode: string | null
   selectedEdge: string | null
-  
+
   stepSelectorState: {
     isOpen: boolean
     position: { x: number; y: number }
@@ -33,14 +33,14 @@ interface WorkflowContextType {
     targetId: string | null
     sourceHandle?: string | null
   }
-  
+
   // Graph operations
   addAction: (parentStepName: string, action: FlowAction) => void
   addTrigger: (trigger: FlowTrigger) => void
   updateStep: (stepName: string, updates: Partial<FlowAction | FlowTrigger>) => void
   deleteStep: (stepName: string) => void
   selectStep: (stepName: string | null) => void
-  
+
   // Legacy operations
   onNodesChange: (changes: NodeChange[]) => void
   onEdgesChange: (changes: EdgeChange[]) => void
@@ -51,7 +51,12 @@ interface WorkflowContextType {
   setSelectedNode: (nodeId: string | null) => void
   setSelectedEdge: (edgeId: string | null) => void
   clearWorkflow: () => void
-  openStepSelector: (sourceId: string, targetId: string, position: { x: number; y: number }, sourceHandle?: string | null) => void
+  openStepSelector: (
+    sourceId: string,
+    targetId: string,
+    position: { x: number; y: number },
+    sourceHandle?: string | null,
+  ) => void
   openStepSelectorForStep: (parentStepName: string, position: { x: number; y: number }) => void
   closeStepSelector: () => void
 }
@@ -88,7 +93,7 @@ const createInitialFlowVersion = (): FlowVersion => ({
 export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) => {
   const [flowVersion, setFlowVersion] = useState<FlowVersion>(createInitialFlowVersion())
   const [selectedStep, setSelectedStep] = useState<string | null>(null)
-  
+
   // Generate graph from flow version (memoized to prevent infinite loops)
   const graph = useMemo(() => {
     try {
@@ -98,7 +103,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
       return { nodes: [], edges: [] }
     }
   }, [flowVersion.trigger])
-  
+
   // Legacy state for backward compatibility
   const [state, setState] = useState<WorkflowState>({
     nodes: [],
@@ -108,7 +113,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     branches: new Map(),
     nodePositions: new Map(),
   })
-  
+
   const [stepSelectorState, setStepSelectorState] = useState({
     isOpen: false,
     position: { x: 0, y: 0 },
@@ -137,7 +142,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     setState((state) => {
       // Check if edge already exists
       const edgeExists = state.edges.some(
-        (edge) => edge.source === connection.source && edge.target === connection.target
+        (edge) => edge.source === connection.source && edge.target === connection.target,
       )
       if (edgeExists) {
         return state // Don't add duplicate edge
@@ -212,16 +217,19 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     })
   }, [])
 
-  const openStepSelector = useCallback((sourceId: string, targetId: string, position: { x: number; y: number }, sourceHandle?: string | null) => {
-    setStepSelectorState({
-      isOpen: true,
-      position,
-      parentStepName: null, // Legacy method doesn't use parentStepName
-      sourceId,
-      targetId,
-      sourceHandle: sourceHandle || null,
-    })
-  }, [])
+  const openStepSelector = useCallback(
+    (sourceId: string, targetId: string, position: { x: number; y: number }, sourceHandle?: string | null) => {
+      setStepSelectorState({
+        isOpen: true,
+        position,
+        parentStepName: null, // Legacy method doesn't use parentStepName
+        sourceId,
+        targetId,
+        sourceHandle: sourceHandle || null,
+      })
+    },
+    [],
+  )
 
   const openStepSelectorForStep = useCallback((parentStepName: string, position: { x: number; y: number }) => {
     setStepSelectorState({
@@ -259,21 +267,21 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         }
         return step
       }
-      
+
       return {
         ...prev,
         trigger: updateStep(prev.trigger) as FlowTrigger,
       }
     })
   }, [])
-  
+
   const addTrigger = useCallback((trigger: FlowTrigger) => {
     setFlowVersion((prev) => ({
       ...prev,
       trigger,
     }))
   }, [])
-  
+
   const updateStep = useCallback((stepName: string, updates: Partial<FlowAction | FlowTrigger>) => {
     setFlowVersion((prev) => {
       const updateStepRecursive = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger => {
@@ -285,14 +293,14 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         }
         return step
       }
-      
+
       return {
         ...prev,
         trigger: updateStepRecursive(prev.trigger) as FlowTrigger,
       }
     })
   }, [])
-  
+
   const deleteStep = useCallback((stepName: string) => {
     setFlowVersion((prev) => {
       const deleteStepRecursive = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger | undefined => {
@@ -305,7 +313,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         }
         return step
       }
-      
+
       const updatedTrigger = deleteStepRecursive(prev.trigger) as FlowTrigger
       return {
         ...prev,
@@ -313,24 +321,24 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
       }
     })
   }, [])
-  
+
   const selectStep = useCallback((stepName: string | null) => {
     setSelectedStep(stepName)
   }, [])
-  
+
   const contextValue: WorkflowContextType = {
     // Graph-based state
     flowVersion,
     graph,
     selectedStep,
-    
+
     // Graph operations
     addAction,
     addTrigger,
     updateStep,
     deleteStep,
     selectStep,
-    
+
     // Legacy support
     nodes: graph.nodes as unknown as WorkflowNode[],
     edges: graph.edges as unknown as WorkflowEdge[],

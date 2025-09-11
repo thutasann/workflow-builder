@@ -11,24 +11,24 @@ import '@xyflow/react/dist/style.css'
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import { useWorkflow } from '../context/WorkflowContext'
-import { ApNodeType, ApEdgeType } from '../types/workflow.types'
+import { ApEdgeType, ApNodeType } from '../types/workflow.types'
 import { convertApGraphToReactFlow } from '../utils/reactFlowConverter'
 
 // New ActivePieces-style components
-import { ApStepNode } from './nodes/ApStepNode'
+import { ApStraightLineEdge } from './edges/ApStraightLineEdge'
 import { ApBigAddButtonNode } from './nodes/ApBigAddButtonNode'
 import { ApGraphEndNode } from './nodes/ApGraphEndNode'
-import { ApStraightLineEdge } from './edges/ApStraightLineEdge'
+import { ApStepNode } from './nodes/ApStepNode'
 
 // Legacy components for backward compatibility
 import { CustomEdge } from './edges/CustomEdge'
 import { ActionNode } from './nodes/ActionNode'
+import { BranchLabelNode } from './nodes/BranchLabelNode'
+import { EndConnectorNode } from './nodes/EndConnectorNode'
 import { RouterNode } from './nodes/RouterNode'
 import { TriggerNode } from './nodes/TriggerNode'
-import { EndConnectorNode } from './nodes/EndConnectorNode'
-import { BranchLabelNode } from './nodes/BranchLabelNode'
-import { WorkflowHeader } from './WorkflowHeader'
 import { StepSelectorHandler } from './StepSelectorHandler'
+import { WorkflowHeader } from './WorkflowHeader'
 
 // ActivePieces-style node and edge types
 const apNodeTypes = {
@@ -50,17 +50,17 @@ const apEdgeTypes = {
 }
 
 const WorkflowCanvasContent: React.FC = () => {
-  const { 
-    graph, 
+  const {
+    graph,
     selectStep,
     // Legacy support
-    onNodesChange, 
-    onEdgesChange, 
-    onConnect, 
-    setSelectedNode, 
-    setSelectedEdge 
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    setSelectedNode,
+    setSelectedEdge,
   } = useWorkflow()
-  
+
   // Convert our graph to React Flow format (memoized to prevent infinite loops)
   const { nodes, edges } = useMemo(() => {
     try {
@@ -85,7 +85,7 @@ const WorkflowCanvasContent: React.FC = () => {
       setSelectedNode(node.id)
       setSelectedEdge(null)
     },
-    [selectStep, setSelectedNode, setSelectedEdge]
+    [selectStep, setSelectedNode, setSelectedEdge],
   )
 
   const onEdgeClick = useCallback(
@@ -93,7 +93,7 @@ const WorkflowCanvasContent: React.FC = () => {
       setSelectedEdge(edge.id)
       setSelectedNode(null)
     },
-    [setSelectedNode, setSelectedEdge]
+    [setSelectedNode, setSelectedEdge],
   )
 
   const onPaneClick = useCallback(() => {

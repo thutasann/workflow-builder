@@ -18,10 +18,7 @@ import {
 import { flowConstants } from './flowConstants'
 
 // Create a big add button graph for empty branches/loops
-const createBigAddButtonGraph = (
-  parentStep: LoopOnItemsAction | RouterAction,
-  nodeData: ApButtonData,
-): ApGraph => {
+const createBigAddButtonGraph = (parentStep: LoopOnItemsAction | RouterAction, nodeData: ApButtonData): ApGraph => {
   const bigAddButtonNode: ApBigAddButtonNode = {
     id: `${parentStep.name}-big-add-button-${nodeData.edgeId}`,
     type: ApNodeType.BIG_ADD_BUTTON,
@@ -91,7 +88,7 @@ const createStepGraph = (step: FlowAction | FlowTrigger, graphHeight: number): A
 
   // Only create edge to graph end if there's no nextAction
   const edges: ApStraightLineEdge[] = []
-  
+
   if (step.type !== FlowActionType.LOOP_ON_ITEMS && step.type !== FlowActionType.ROUTER) {
     if (!step.nextAction) {
       // Create edge to graph end only if this is the last step
@@ -139,9 +136,7 @@ export const mergeGraph = (graph1: ApGraph, graph2: ApGraph): ApGraph => {
 
 // Calculate graph bounding box
 export const calculateGraphBoundingBox = (graph: ApGraph): BoundingBox => {
-  const nodesAffectingBoundingBox = graph.nodes.filter((node) =>
-    flowConstants.doesNodeAffectBoundingBox(node.type),
-  )
+  const nodesAffectingBoundingBox = graph.nodes.filter((node) => flowConstants.doesNodeAffectBoundingBox(node.type))
 
   if (nodesAffectingBoundingBox.length === 0) {
     return {
@@ -157,9 +152,7 @@ export const calculateGraphBoundingBox = (graph: ApGraph): BoundingBox => {
   const minX = Math.min(...nodesAffectingBoundingBox.map((node) => node.position.x))
   const minY = Math.min(...graph.nodes.map((node) => node.position.y))
   const maxX = Math.max(
-    ...nodesAffectingBoundingBox.map(
-      (node) => node.position.x + flowConstants.AP_NODE_SIZE.step.width,
-    ),
+    ...nodesAffectingBoundingBox.map((node) => node.position.x + flowConstants.AP_NODE_SIZE.step.width),
   )
   const maxY = Math.max(...graph.nodes.map((node) => node.position.y))
 
@@ -190,9 +183,7 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
   })
 
   const childGraphsAfterOffset = offsetRouterChildSteps(childGraphs)
-  const maxHeight = Math.max(
-    ...childGraphsAfterOffset.map((cg) => calculateGraphBoundingBox(cg).height),
-  )
+  const maxHeight = Math.max(...childGraphsAfterOffset.map((cg) => calculateGraphBoundingBox(cg).height))
 
   const subgraphEndNode: ApGraphEndNode = {
     id: `${step.name}-branch-subgraph-end`,
@@ -218,21 +209,14 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
 
 // ActivePieces branch positioning algorithm
 const offsetRouterChildSteps = (childGraphs: ApGraph[]): ApGraph[] => {
-  const childGraphsBoundingBoxes = childGraphs.map((childGraph) =>
-    calculateGraphBoundingBox(childGraph),
-  )
+  const childGraphsBoundingBoxes = childGraphs.map((childGraph) => calculateGraphBoundingBox(childGraph))
 
   const totalWidth =
     childGraphsBoundingBoxes.reduce((acc, current) => acc + current.width, 0) +
     flowConstants.HORIZONTAL_SPACE_BETWEEN_NODES * (childGraphs.length - 1)
 
   let deltaLeftX =
-    -(
-      totalWidth -
-      childGraphsBoundingBoxes[0].left -
-      childGraphsBoundingBoxes[childGraphs.length - 1].right
-    ) /
-      2 -
+    -(totalWidth - childGraphsBoundingBoxes[0].left - childGraphsBoundingBoxes[childGraphs.length - 1].right) / 2 -
     childGraphsBoundingBoxes[0].left
 
   return childGraphsBoundingBoxes.map((childGraphBoundingBox, index) => {
@@ -240,9 +224,7 @@ const offsetRouterChildSteps = (childGraphs: ApGraph[]): ApGraph[] => {
     deltaLeftX += childGraphBoundingBox.width + flowConstants.HORIZONTAL_SPACE_BETWEEN_NODES
     return offsetGraph(childGraphs[index], {
       x,
-      y:
-        flowConstants.AP_NODE_SIZE.step.height +
-        flowConstants.VERTICAL_OFFSET_BETWEEN_ROUTER_AND_CHILD,
+      y: flowConstants.AP_NODE_SIZE.step.height + flowConstants.VERTICAL_OFFSET_BETWEEN_ROUTER_AND_CHILD,
     })
   })
 }
@@ -279,8 +261,8 @@ export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph 
     step.type === FlowActionType.LOOP_ON_ITEMS
       ? null // TODO: implement loop child graph
       : step.type === FlowActionType.ROUTER
-      ? buildRouterChildGraph(step as RouterAction)
-      : null
+        ? buildRouterChildGraph(step as RouterAction)
+        : null
 
   const graphWithChild = childGraph ? mergeGraph(graph, childGraph) : graph
   const nextStepGraph = buildGraph(step.nextAction)
@@ -309,9 +291,7 @@ export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph 
 // Convert FlowVersion to graph (main entry point)
 export const convertFlowVersionToGraph = (trigger: FlowTrigger): ApGraph => {
   const graph = buildGraph(trigger)
-  const graphEndWidget = graph.nodes.findLast(
-    (node) => node.type === ApNodeType.GRAPH_END_WIDGET,
-  ) as ApGraphEndNode
+  const graphEndWidget = graph.nodes.findLast((node) => node.type === ApNodeType.GRAPH_END_WIDGET) as ApGraphEndNode
 
   if (graphEndWidget) {
     graphEndWidget.data.showWidget = true

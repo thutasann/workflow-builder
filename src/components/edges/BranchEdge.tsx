@@ -45,11 +45,7 @@ export const BranchEdge: React.FC<BranchEdgeProps> = ({
 
   return (
     <>
-      <BaseEdge 
-        path={edgePath} 
-        markerEnd={markerEnd} 
-        style={{ stroke: strokeColor, strokeWidth: 2 }}
-      />
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={{ stroke: strokeColor, strokeWidth: 2 }} />
       <EdgeLabelRenderer>
         <div
           style={{

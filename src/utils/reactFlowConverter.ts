@@ -4,7 +4,9 @@ import type { ApGraph, ApNode, ApEdge } from '../types/workflow.types'
 /**
  * Convert our custom ApGraph to React Flow compatible format
  */
-export const convertApGraphToReactFlow = (graph: ApGraph): {
+export const convertApGraphToReactFlow = (
+  graph: ApGraph,
+): {
   nodes: Node[]
   edges: Edge[]
 } => {
@@ -28,18 +30,24 @@ export const convertApGraphToReactFlow = (graph: ApGraph): {
     }
 
     // Check if source and target nodes exist
-    const sourceExists = nodes.some(node => node.id === apEdge.source)
-    const targetExists = nodes.some(node => node.id === apEdge.target)
+    const sourceExists = nodes.some((node) => node.id === apEdge.source)
+    const targetExists = nodes.some((node) => node.id === apEdge.target)
 
     if (!sourceExists) {
       console.error(`Source node ${apEdge.source} not found for edge ${apEdge.id}`)
-      console.log('Available nodes:', nodes.map(n => n.id))
+      console.log(
+        'Available nodes:',
+        nodes.map((n) => n.id),
+      )
       throw new Error(`Source node ${apEdge.source} not found`)
     }
 
     if (!targetExists) {
       console.error(`Target node ${apEdge.target} not found for edge ${apEdge.id}`)
-      console.log('Available nodes:', nodes.map(n => n.id))
+      console.log(
+        'Available nodes:',
+        nodes.map((n) => n.id),
+      )
       throw new Error(`Target node ${apEdge.target} not found`)
     }
 

@@ -57,7 +57,7 @@ export const ApStepNode = React.memo(({ data: { step } }: NodeProps & Omit<ApSte
           'border-primary/70': isSelected,
           'shadow-sm': true,
         },
-        getStepColor()
+        getStepColor(),
       )}
       onClick={handleStepClick}
     >

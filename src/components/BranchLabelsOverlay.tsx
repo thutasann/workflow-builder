@@ -6,29 +6,25 @@ import { calculateBranchPositions } from '../utils/layoutUtils'
 export const BranchLabelsOverlay: React.FC = () => {
   const { getNodes } = useReactFlow()
   const nodes = getNodes() as WorkflowNode[]
-  
+
   // Find all router nodes
-  const routerNodes = nodes.filter(node => node.type === 'router')
-  
-  const labels = [
-    'Add Customer to Sheet',
-    'Notify Me on Slack', 
-    'Send Email to Customer',
-  ]
-  
+  const routerNodes = nodes.filter((node) => node.type === 'router')
+
+  const labels = ['Add Customer to Sheet', 'Notify Me on Slack', 'Send Email to Customer']
+
   return (
     <>
-      {routerNodes.map(routerNode => {
+      {routerNodes.map((routerNode) => {
         const branchPositions = calculateBranchPositions(routerNode.position.x, 4)
         const labelY = routerNode.position.y + 60 // Closer to router
-        
+
         return (
           <React.Fragment key={`labels-${routerNode.id}`}>
             {/* Regular branch labels */}
             {branchPositions.slice(0, 3).map((x, index) => (
               <div
                 key={`branch-label-${routerNode.id}-${index}`}
-                className="react-flow__node"
+                className='react-flow__node'
                 style={{
                   position: 'absolute',
                   left: x,
@@ -49,10 +45,10 @@ export const BranchLabelsOverlay: React.FC = () => {
                 {labels[index]}
               </div>
             ))}
-            
+
             {/* Otherwise label */}
             <div
-              className="react-flow__node"
+              className='react-flow__node'
               style={{
                 position: 'absolute',
                 left: branchPositions[3],

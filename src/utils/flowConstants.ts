@@ -48,9 +48,7 @@ const AP_NODE_SIZE = {
 
 // Helper function to determine if node affects bounding box
 const doesNodeAffectBoundingBox = (type: ApNodeType): boolean =>
-  type === ApNodeType.BIG_ADD_BUTTON ||
-  type === ApNodeType.STEP ||
-  type === ApNodeType.LOOP_RETURN_NODE
+  type === ApNodeType.BIG_ADD_BUTTON || type === ApNodeType.STEP || type === ApNodeType.LOOP_RETURN_NODE
 
 export const flowConstants = {
   // Arc constants
@@ -62,7 +60,7 @@ export const flowConstants = {
   ARC_RIGHT_UP,
   ARC_LEFT_UP,
   ARROW_DOWN,
-  
+
   // Spacing constants
   VERTICAL_SPACE_BETWEEN_STEP_AND_LINE,
   VERTICAL_SPACE_BETWEEN_STEPS,
@@ -72,13 +70,13 @@ export const flowConstants = {
   LABEL_VERTICAL_PADDING,
   LINE_WIDTH,
   HORIZONTAL_SPACE_BETWEEN_NODES,
-  
+
   // Node sizes
   AP_NODE_SIZE,
-  
+
   // Helper functions
   doesNodeAffectBoundingBox,
-  
+
   // Handle styling
   HANDLE_STYLING: { opacity: 0, cursor: 'default' },
 }

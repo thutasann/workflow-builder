@@ -1,58 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 interface StepOption {
-  id: string;
-  type: 'action' | 'router';
-  label: string;
-  icon: string;
-  category: string;
-  description?: string;
-  integrationLogo?: string;
+  id: string
+  type: 'action' | 'router'
+  label: string
+  icon: string
+  category: string
+  description?: string
+  integrationLogo?: string
 }
 
 interface StepSelectorProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (option: StepOption) => void;
-  position?: { x: number; y: number };
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (option: StepOption) => void
+  position?: { x: number; y: number }
 }
 
 const stepOptions: StepOption[] = [
   // Popular integrations
-  { id: 'google-sheets', type: 'action', label: 'Google Sheets', icon: '📊', category: 'Popular', integrationLogo: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlesheets.svg' },
-  { id: 'slack', type: 'action', label: 'Slack', icon: '💬', category: 'Popular', integrationLogo: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg' },
-  { id: 'notion', type: 'action', label: 'Notion', icon: '📝', category: 'Popular', integrationLogo: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png' },
-  { id: 'gmail', type: 'action', label: 'Gmail', icon: '📧', category: 'Popular', integrationLogo: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg' },
-  { id: 'hubspot', type: 'action', label: 'HubSpot', icon: '🎯', category: 'Popular', integrationLogo: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/hubspot.svg' },
-  
+  {
+    id: 'google-sheets',
+    type: 'action',
+    label: 'Google Sheets',
+    icon: '📊',
+    category: 'Popular',
+    integrationLogo: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlesheets.svg',
+  },
+  {
+    id: 'slack',
+    type: 'action',
+    label: 'Slack',
+    icon: '💬',
+    category: 'Popular',
+    integrationLogo: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg',
+  },
+  {
+    id: 'notion',
+    type: 'action',
+    label: 'Notion',
+    icon: '📝',
+    category: 'Popular',
+    integrationLogo: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
+  },
+  {
+    id: 'gmail',
+    type: 'action',
+    label: 'Gmail',
+    icon: '📧',
+    category: 'Popular',
+    integrationLogo: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg',
+  },
+  {
+    id: 'hubspot',
+    type: 'action',
+    label: 'HubSpot',
+    icon: '🎯',
+    category: 'Popular',
+    integrationLogo: 'https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/hubspot.svg',
+  },
+
   // Utility nodes
-  { id: 'router', type: 'router', label: 'Router', icon: '🔀', category: 'Highlights', description: 'Route to multiple branches' },
+  {
+    id: 'router',
+    type: 'router',
+    label: 'Router',
+    icon: '🔀',
+    category: 'Highlights',
+    description: 'Route to multiple branches',
+  },
   { id: 'http', type: 'action', label: 'HTTP', icon: '🌐', category: 'Highlights', description: 'Make HTTP requests' },
   { id: 'code', type: 'action', label: 'Code', icon: '💻', category: 'Highlights', description: 'Run custom code' },
-  { id: 'tables', type: 'action', label: 'Tables', icon: '📊', category: 'Highlights', description: 'Work with tables' },
-];
+  {
+    id: 'tables',
+    type: 'action',
+    label: 'Tables',
+    icon: '📊',
+    category: 'Highlights',
+    description: 'Work with tables',
+  },
+]
 
-export const StepSelector: React.FC<StepSelectorProps> = ({
-  isOpen,
-  onClose,
-  onSelect,
-  position
-}) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'utility'>('all');
+export const StepSelector: React.FC<StepSelectorProps> = ({ isOpen, onClose, onSelect, position }) => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'utility'>('all')
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const filteredOptions = stepOptions.filter(option => {
-    const matchesSearch = option.label.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = activeTab === 'all' || 
+  const filteredOptions = stepOptions.filter((option) => {
+    const matchesSearch = option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesTab =
+      activeTab === 'all' ||
       (activeTab === 'popular' && option.category === 'Popular') ||
-      (activeTab === 'utility' && option.category === 'Highlights');
-    return matchesSearch && matchesTab;
-  });
+      (activeTab === 'utility' && option.category === 'Highlights')
+    return matchesSearch && matchesTab
+  })
 
-  const popularOptions = filteredOptions.filter(o => o.category === 'Popular');
-  const highlightOptions = filteredOptions.filter(o => o.category === 'Highlights');
+  const popularOptions = filteredOptions.filter((o) => o.category === 'Popular')
+  const highlightOptions = filteredOptions.filter((o) => o.category === 'Highlights')
 
   return (
     <>
@@ -85,13 +130,15 @@ export const StepSelector: React.FC<StepSelectorProps> = ({
         }}
       >
         {/* Header */}
-        <div style={{ 
-          padding: '20px', 
-          borderBottom: '1px solid #e5e7eb' 
-        }}>
+        <div
+          style={{
+            padding: '20px',
+            borderBottom: '1px solid #e5e7eb',
+          }}
+        >
           <input
-            type="text"
-            placeholder="Search"
+            type='text'
+            placeholder='Search'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -107,12 +154,14 @@ export const StepSelector: React.FC<StepSelectorProps> = ({
         </div>
 
         {/* Tabs */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '20px',
-          padding: '0 20px',
-          borderBottom: '1px solid #e5e7eb',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '20px',
+            padding: '0 20px',
+            borderBottom: '1px solid #e5e7eb',
+          }}
+        >
           <button
             onClick={() => setActiveTab('all')}
             style={{
@@ -161,29 +210,37 @@ export const StepSelector: React.FC<StepSelectorProps> = ({
         </div>
 
         {/* Content */}
-        <div style={{ 
-          flex: 1,
-          overflowY: 'auto',
-          padding: '20px',
-        }}>
+        <div
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '20px',
+          }}
+        >
           {activeTab === 'all' && (
             <>
               {popularOptions.length > 0 && (
                 <div style={{ marginBottom: '30px' }}>
-                  <h3 style={{ 
-                    fontSize: '14px', 
-                    fontWeight: 600, 
-                    color: '#374151',
-                    marginBottom: '12px' 
-                  }}>
+                  <h3
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#374151',
+                      marginBottom: '12px',
+                    }}
+                  >
                     Popular
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {popularOptions.map(option => (
-                      <StepOption key={option.id} option={option} onSelect={() => {
-                        onSelect(option);
-                        onClose();
-                      }} />
+                    {popularOptions.map((option) => (
+                      <StepOption
+                        key={option.id}
+                        option={option}
+                        onSelect={() => {
+                          onSelect(option)
+                          onClose()
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
@@ -191,20 +248,26 @@ export const StepSelector: React.FC<StepSelectorProps> = ({
 
               {highlightOptions.length > 0 && (
                 <div>
-                  <h3 style={{ 
-                    fontSize: '14px', 
-                    fontWeight: 600, 
-                    color: '#374151',
-                    marginBottom: '12px' 
-                  }}>
+                  <h3
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: '#374151',
+                      marginBottom: '12px',
+                    }}
+                  >
                     Highlights
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {highlightOptions.map(option => (
-                      <StepOption key={option.id} option={option} onSelect={() => {
-                        onSelect(option);
-                        onClose();
-                      }} />
+                    {highlightOptions.map((option) => (
+                      <StepOption
+                        key={option.id}
+                        option={option}
+                        onSelect={() => {
+                          onSelect(option)
+                          onClose()
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
@@ -214,33 +277,39 @@ export const StepSelector: React.FC<StepSelectorProps> = ({
 
           {activeTab !== 'all' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {filteredOptions.map(option => (
-                <StepOption key={option.id} option={option} onSelect={() => {
-                  onSelect(option);
-                  onClose();
-                }} />
+              {filteredOptions.map((option) => (
+                <StepOption
+                  key={option.id}
+                  option={option}
+                  onSelect={() => {
+                    onSelect(option)
+                    onClose()
+                  }}
+                />
               ))}
             </div>
           )}
 
           {filteredOptions.length === 0 && (
-            <p style={{ 
-              textAlign: 'center', 
-              color: '#9ca3af',
-              marginTop: '40px' 
-            }}>
+            <p
+              style={{
+                textAlign: 'center',
+                color: '#9ca3af',
+                marginTop: '40px',
+              }}
+            >
               No results found
             </p>
           )}
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
 interface StepOptionProps {
-  option: StepOption;
-  onSelect: () => void;
+  option: StepOption
+  onSelect: () => void
 }
 
 const StepOption: React.FC<StepOptionProps> = ({ option, onSelect }) => (
@@ -257,10 +326,10 @@ const StepOption: React.FC<StepOptionProps> = ({ option, onSelect }) => (
       backgroundColor: '#fff',
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = '#f3f4f6';
+      e.currentTarget.style.backgroundColor = '#f3f4f6'
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = '#fff';
+      e.currentTarget.style.backgroundColor = '#fff'
     }}
   >
     {option.integrationLogo ? (
@@ -275,10 +344,8 @@ const StepOption: React.FC<StepOptionProps> = ({ option, onSelect }) => (
     <div style={{ flex: 1 }}>
       <div style={{ fontWeight: 500, color: '#1f2937' }}>{option.label}</div>
       {option.description && (
-        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
-          {option.description}
-        </div>
+        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>{option.description}</div>
       )}
     </div>
   </div>
-);
+)

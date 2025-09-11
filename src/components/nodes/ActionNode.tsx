@@ -1,6 +1,6 @@
-import React from 'react';
-import { Handle, Position } from '@xyflow/react';
-import type { CustomNodeProps } from '../../types/workflow.types';
+import React from 'react'
+import { Handle, Position } from '@xyflow/react'
+import type { CustomNodeProps } from '../../types/workflow.types'
 
 export const ActionNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
   return (
@@ -17,7 +17,7 @@ export const ActionNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
       }}
     >
       <Handle
-        type="target"
+        type='target'
         position={Position.Top}
         style={{
           width: '10px',
@@ -37,25 +37,25 @@ export const ActionNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
           />
         )}
         <div style={{ flex: 1 }}>
-          <div style={{ 
-            fontWeight: 600, 
-            fontSize: '16px', 
-            color: '#1a1a1a',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: '16px',
+              color: '#1a1a1a',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
             <span>{data.stepNumber}.</span>
             <span>{data.label}</span>
           </div>
-          <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
-            {data.integrationName}
-          </div>
+          <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>{data.integrationName}</div>
         </div>
       </div>
 
       <Handle
-        type="source"
+        type='source'
         position={Position.Bottom}
         style={{
           width: '10px',
@@ -66,5 +66,5 @@ export const ActionNode: React.FC<CustomNodeProps> = ({ data, selected }) => {
         }}
       />
     </div>
-  );
-};
+  )
+}
