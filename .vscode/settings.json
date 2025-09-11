@@ -1,0 +1,18 @@
+{
+  // set typescript version to local - because every developer have diff version of typescript on their pc this can cause unexpected error
+  // format on save enable - so all of our codes will be formatted and easy to read
+  "editor.formatOnSave": true,
+  // organize imports enable - so all of import will be organized and easy to find what dependencies are imported
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    }
+  },
+  // set default formatter to prettier - so we can share format settings to other developers [ please install prettier extension in vscode ]
+  // "editor.defaultFormatter": "esbenp.prettier-vscode", // we only need to format typescript and typescript react
+  "tailwindCSS.rootFontSize": 14,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
