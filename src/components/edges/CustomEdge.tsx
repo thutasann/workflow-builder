@@ -23,82 +23,69 @@ export const CustomEdge: React.FC<EdgeProps> = ({
 
   const handleAddNode = () => {
     const newNodeId = `node_${Date.now()}`
-    const nodes = getNodes()
+    const currentNodes = getNodes()
+    const nodeSpacing = 200 // Same spacing as in App.tsx
 
     // Find source and target nodes
-    const sourceNode = nodes.find((n) => n.id === source)
-    const targetNode = nodes.find((n) => n.id === target)
+    const sourceNode = currentNodes.find((n) => n.id === source)
+    const targetNode = currentNodes.find((n) => n.id === target)
 
     if (!sourceNode || !targetNode) return
 
-    // Calculate position: same X as other nodes, Y in the middle
-    const newY = (sourceNode.position.y + targetNode.position.y) / 2
-    const nodeSpacing = 200 // Same spacing as in App.tsx
-
-    const newNode = {
-      id: newNodeId,
-      type: 'action' as const,
-      position: {
-        x: sourceNode.position.x, // Same X position as other nodes
-        y: newY,
-      },
-      data: {
-        label: 'New Action',
-        type: 'action' as const,
-        stepNumber: `${nodes.filter((n) => n.type === 'action' && n.id !== 'end-placeholder').length + 1}`,
-        integrationName: 'Custom',
-      },
-    }
-
-    // Add new node
     setNodes((nodes) => {
-      const allNodes = [...nodes, newNode]
+      // Create the new node with a temporary position between source and target
+      const newNode = {
+        id: newNodeId,
+        type: 'action' as const,
+        position: {
+          x: sourceNode.position.x,
+          y: (sourceNode.position.y + targetNode.position.y) / 2, // Place between source and target
+        },
+        data: {
+          label: 'New Action',
+          type: 'action' as const,
+          stepNumber: '',
+          integrationName: 'Custom',
+        },
+      }
 
-      // Sort nodes by Y position and recalculate positions to maintain even spacing
-      const sortedNodes = allNodes.sort((a, b) => a.position.y - b.position.y)
+      // Add the new node to the array
+      let updatedNodes = [...nodes, newNode]
 
-      // Filter out placeholder and get the first real node
-      const realNodes = sortedNodes.filter((n) => n.id !== 'end-placeholder')
-      const placeholderNode = sortedNodes.find((n) => n.id === 'end-placeholder')
-      
-      if (realNodes.length === 0) return allNodes
+      // Sort all nodes by Y position
+      updatedNodes.sort((a, b) => a.position.y - b.position.y)
 
-      let currentY = realNodes[0].position.y
+      // Find the trigger node to get the starting position
+      const triggerNode = updatedNodes.find((n) => n.type === 'trigger')
+      const startY = triggerNode ? triggerNode.position.y : 100
 
-      // Update positions for all real nodes
-      const updatedRealNodes = realNodes.map((node, index) => {
+      // Reposition all nodes with consistent spacing
+      let currentY = startY
+      let actionCount = 0
+
+      updatedNodes = updatedNodes.map((node) => {
         const updatedNode = {
           ...node,
-          position: { ...node.position, y: currentY },
+          position: { ...node.position, y: currentY }
         }
 
         // Update step numbers
         if (node.type === 'trigger') {
-          updatedNode.data = {
-            ...node.data,
-            stepNumber: '1',
-          }
-        } else if (node.type === 'action') {
-          updatedNode.data = {
-            ...node.data,
-            stepNumber: `${index + 1}`, // Will be 2, 3, 4, etc. for actions
-          }
+          updatedNode.data = { ...node.data, stepNumber: '1' }
+        } else if (node.type === 'action' && node.id !== 'end-placeholder') {
+          actionCount++
+          updatedNode.data = { ...node.data, stepNumber: `${actionCount + 1}` }
         }
 
-        currentY += nodeSpacing
+        // Only increment Y for non-placeholder nodes
+        if (node.id !== 'end-placeholder' || updatedNodes.filter(n => n.id !== 'end-placeholder').length > 1) {
+          currentY += nodeSpacing
+        }
+        
         return updatedNode
       })
 
-      // Update placeholder position if it exists
-      if (placeholderNode) {
-        const updatedPlaceholder = {
-          ...placeholderNode,
-          position: { ...placeholderNode.position, y: currentY },
-        }
-        return [...updatedRealNodes, updatedPlaceholder]
-      }
-
-      return updatedRealNodes
+      return updatedNodes
     })
 
     // Update edges

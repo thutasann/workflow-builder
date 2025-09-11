@@ -22,6 +22,7 @@ interface WorkflowContextType {
   deleteNode: (nodeId: string) => void;
   setSelectedNode: (nodeId: string | null) => void;
   setSelectedEdge: (edgeId: string | null) => void;
+  clearWorkflow: () => void;
 }
 
 const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined);
@@ -68,19 +69,42 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      setState((state) => ({
-        ...state,
-        edges: addEdge(connection, state.edges) as WorkflowEdge[],
-      }));
+      setState((state) => {
+        // Check if edge already exists
+        const edgeExists = state.edges.some(
+          edge => edge.source === connection.source && edge.target === connection.target
+        );
+        if (edgeExists) {
+          return state; // Don't add duplicate edge
+        }
+        
+        // Create edge with custom type
+        const newEdge = {
+          ...connection,
+          id: `${connection.source}-${connection.target}`,
+          type: 'custom',
+        } as WorkflowEdge;
+        
+        return {
+          ...state,
+          edges: [...state.edges, newEdge],
+        };
+      });
     },
     []
   );
 
   const addNode = useCallback((node: WorkflowNode) => {
-    setState((state) => ({
-      ...state,
-      nodes: [...state.nodes, node],
-    }));
+    setState((state) => {
+      // Check if node with this ID already exists
+      if (state.nodes.some(n => n.id === node.id)) {
+        return state; // Don't add duplicate
+      }
+      return {
+        ...state,
+        nodes: [...state.nodes, node],
+      };
+    });
   }, []);
 
   const updateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
@@ -116,6 +140,15 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     }));
   }, []);
 
+  const clearWorkflow = useCallback(() => {
+    setState({
+      nodes: [],
+      edges: [],
+      selectedNode: null,
+      selectedEdge: null,
+    });
+  }, []);
+
   const contextValue: WorkflowContextType = {
     nodes: state.nodes,
     edges: state.edges,
@@ -129,6 +162,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     deleteNode,
     setSelectedNode,
     setSelectedEdge,
+    clearWorkflow,
   };
 
   return (

@@ -1,19 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { WorkflowProvider } from './context/WorkflowContext';
 import { WorkflowCanvas } from './components/WorkflowCanvas';
 import { useWorkflow } from './context/WorkflowContext';
 import './App.css';
 
 const WorkflowBuilder: React.FC = () => {
-  const { addNode, onConnect } = useWorkflow();
+  const { nodes, addNode, onConnect } = useWorkflow();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Only add nodes once
+    if (isInitialized || nodes.some(n => n.id === 'trigger-1')) return;
+
     // Center X position for all nodes
     const centerX = 400;
     const nodeSpacing = 200;
     const startY = 100;
 
-    // Add initial trigger and action nodes
+    // Add initial trigger node only
     addNode({
       id: 'trigger-1',
       type: 'trigger',
@@ -23,32 +27,7 @@ const WorkflowBuilder: React.FC = () => {
         type: 'trigger',
         integrationName: 'Slack',
         integrationLogo: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg',
-      },
-    });
-
-    addNode({
-      id: 'action-1',
-      type: 'action',
-      position: { x: centerX, y: startY + nodeSpacing },
-      data: {
-        label: 'Create Database Item...',
-        type: 'action',
-        stepNumber: '2',
-        integrationName: 'Notion',
-        integrationLogo: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
-      },
-    });
-
-    addNode({
-      id: 'action-2',
-      type: 'action',
-      position: { x: centerX, y: startY + nodeSpacing * 2 },
-      data: {
-        label: 'Get Card',
-        type: 'action',
-        stepNumber: '3',
-        integrationName: 'Trello',
-        integrationLogo: 'https://upload.wikimedia.org/wikipedia/en/8/8c/Trello_logo.svg',
+        stepNumber: '1',
       },
     });
 
@@ -56,7 +35,7 @@ const WorkflowBuilder: React.FC = () => {
     addNode({
       id: 'end-placeholder',
       type: 'action',
-      position: { x: centerX, y: startY + nodeSpacing * 3 },
+      position: { x: centerX, y: startY + nodeSpacing },
       data: {
         label: '',
         type: 'action',
@@ -65,11 +44,11 @@ const WorkflowBuilder: React.FC = () => {
       style: { opacity: 0, pointerEvents: 'none' },
     });
 
-    // Add edges to connect nodes
-    onConnect({ source: 'trigger-1', target: 'action-1', sourceHandle: null, targetHandle: null });
-    onConnect({ source: 'action-1', target: 'action-2', sourceHandle: null, targetHandle: null });
-    onConnect({ source: 'action-2', target: 'end-placeholder', sourceHandle: null, targetHandle: null });
-  }, [addNode, onConnect]);
+    // Add edge from trigger to placeholder
+    onConnect({ source: 'trigger-1', target: 'end-placeholder', sourceHandle: null, targetHandle: null });
+    
+    setIsInitialized(true);
+  }, [isInitialized, nodes, addNode, onConnect]);
 
   return <WorkflowCanvas />;
 };

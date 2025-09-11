@@ -28,6 +28,9 @@ const edgeTypes = {
 const WorkflowCanvasContent: React.FC = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setSelectedNode, setSelectedEdge } = useWorkflow()
 
+  console.log('nodes ==> ', nodes)
+  console.log('edges ==> ', edges)
+
   const { setViewport } = useReactFlow()
 
   useEffect(() => {
