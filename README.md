@@ -17,10 +17,6 @@ A visual workflow automation builder inspired by ActivePieces, built with React,
 - **TypeScript Support** - Full type safety and IntelliSense
 - **State Management** - Context API for global workflow state
 
-## 📸 Screenshot
-
-<img width="600" alt="Workflow Builder Screenshot" src="https://user-images.githubusercontent.com/placeholder/workflow-screenshot.png">
-
 ## 🏗️ Project Structure
 
 ```
@@ -81,10 +77,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 ## 💻 Basic Usage
 
 ```typescript
-import { useWorkflow } from './context/WorkflowContext';
+import { useWorkflow } from './context/WorkflowContext'
 
 function MyWorkflow() {
-  const { nodes, edges, addNode, onConnect } = useWorkflow();
+  const { nodes, edges, addNode, onConnect } = useWorkflow()
 
   // Add a new action node
   const handleAddAction = () => {
@@ -96,12 +92,12 @@ function MyWorkflow() {
         label: 'Send Email',
         type: 'action',
         stepNumber: '2',
-        integrationName: 'Gmail'
-      }
-    });
-  };
+        integrationName: 'Gmail',
+      },
+    })
+  }
 
-  return <WorkflowCanvas />;
+  return <WorkflowCanvas />
 }
 ```
 
@@ -143,6 +139,7 @@ npm run type-check # Run TypeScript compiler
 ## 📋 Roadmap
 
 ### Phase 1 ✅ (Completed)
+
 - [x] Basic workflow visualization
 - [x] Custom node components
 - [x] Edge insertion controls
@@ -150,6 +147,7 @@ npm run type-check # Run TypeScript compiler
 - [x] TypeScript integration
 
 ### Phase 2 🚧 (Planned)
+
 - [ ] Node palette/sidebar
 - [ ] Drag and drop support
 - [ ] Connection validation
@@ -157,6 +155,7 @@ npm run type-check # Run TypeScript compiler
 - [ ] Workflow templates
 
 ### Phase 3 🔮 (Future)
+
 - [ ] Workflow execution engine
 - [ ] Import/Export (JSON/YAML)
 - [ ] Undo/Redo functionality
