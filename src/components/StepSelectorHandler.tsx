@@ -41,11 +41,9 @@ export const StepSelectorHandler: React.FC = () => {
       newAction = {
         ...newAction,
         settings: {
-          branches: [
-            { branchName: 'Branch 1', branchType: BranchExecutionType.CONDITION },
-          ]
+          branches: [{ branchName: 'Branch 1', branchType: BranchExecutionType.CONDITION }],
         },
-        children: [undefined, undefined] // 1 condition + 1 otherwise
+        children: [undefined, undefined], // 1 condition + 1 otherwise
       }
     }
 
@@ -54,9 +52,9 @@ export const StepSelectorHandler: React.FC = () => {
       newAction = {
         ...newAction,
         settings: {
-          items: '' // Empty expression initially
+          items: '', // Empty expression initially
         },
-        firstLoopAction: undefined
+        firstLoopAction: undefined,
       }
     }
 

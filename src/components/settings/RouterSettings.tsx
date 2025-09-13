@@ -17,17 +17,17 @@ export const RouterSettings: React.FC<RouterSettingsProps> = ({ step }) => {
     const newBranch = {
       branchName: `Branch ${step.settings.branches.length + 1}`,
       branchType: BranchExecutionType.CONDITION,
-      conditions: []
+      conditions: [],
     }
 
     const newChildren = [...step.children, undefined]
-    
+
     updateStep(step.name, {
       settings: {
         ...step.settings,
-        branches: [...step.settings.branches, newBranch]
+        branches: [...step.settings.branches, newBranch],
       },
-      children: newChildren
+      children: newChildren,
     } as Partial<RouterAction>)
   }
 
@@ -41,9 +41,9 @@ export const RouterSettings: React.FC<RouterSettingsProps> = ({ step }) => {
     updateStep(step.name, {
       settings: {
         ...step.settings,
-        branches: newBranches
+        branches: newBranches,
       },
-      children: newChildren
+      children: newChildren,
     } as Partial<RouterAction>)
 
     setSelectedBranchIndex(null)
@@ -53,14 +53,14 @@ export const RouterSettings: React.FC<RouterSettingsProps> = ({ step }) => {
     const newBranches = [...step.settings.branches]
     newBranches[index] = {
       ...newBranches[index],
-      branchName: newName
+      branchName: newName,
     }
 
     updateStep(step.name, {
       settings: {
         ...step.settings,
-        branches: newBranches
-      }
+        branches: newBranches,
+      },
     } as Partial<RouterAction>)
   }
 
@@ -79,17 +79,17 @@ export const RouterSettings: React.FC<RouterSettingsProps> = ({ step }) => {
     updateStep(step.name, {
       settings: {
         ...step.settings,
-        branches: newBranches
+        branches: newBranches,
       },
-      children: newChildren
+      children: newChildren,
     } as Partial<RouterAction>)
   }
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Branches</h3>
-        <p className="text-xs text-gray-500 mb-4">
+        <h3 className='text-sm font-medium text-gray-700 mb-2'>Branches</h3>
+        <p className='text-xs text-gray-500 mb-4'>
           Add multiple branches to execute different actions based on conditions
         </p>
       </div>
@@ -105,16 +105,14 @@ export const RouterSettings: React.FC<RouterSettingsProps> = ({ step }) => {
 
       <button
         onClick={handleAddBranch}
-        className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm"
+        className='w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm'
       >
-        <Plus className="w-4 h-4" />
+        <Plus className='w-4 h-4' />
         Add Branch
       </button>
 
-      <div className="border-t pt-4">
-        <p className="text-xs text-gray-500">
-          The "Otherwise" branch will always execute if no other conditions match
-        </p>
+      <div className='border-t pt-4'>
+        <p className='text-xs text-gray-500'>The "Otherwise" branch will always execute if no other conditions match</p>
       </div>
     </div>
   )

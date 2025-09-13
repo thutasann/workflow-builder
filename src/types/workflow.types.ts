@@ -1,4 +1,3 @@
-
 // ActivePieces-inspired Node Types
 export enum ApNodeType {
   STEP = 'step',
@@ -218,4 +217,3 @@ export interface BoundingBox {
   top: number
   bottom: number
 }
-

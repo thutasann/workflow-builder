@@ -17,7 +17,7 @@ export const BranchesList: React.FC<BranchesListProps> = ({
   setSelectedBranchIndex,
   onDeleteBranch,
   onRenameBranch,
-  onMoveBranch
+  onMoveBranch,
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editingName, setEditingName] = useState('')
@@ -48,7 +48,7 @@ export const BranchesList: React.FC<BranchesListProps> = ({
   }
 
   return (
-    <div className="space-y-2">
+    <div className='space-y-2'>
       {step.children.map((_, index) => {
         const isOtherwise = index === step.children.length - 1
         const displayName = getBranchDisplayName(index)
@@ -58,24 +58,20 @@ export const BranchesList: React.FC<BranchesListProps> = ({
           <div
             key={index}
             className={`flex items-center gap-2 p-3 rounded-md border transition-colors cursor-pointer ${
-              selectedBranchIndex === index
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
+              selectedBranchIndex === index ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => setSelectedBranchIndex(index)}
           >
-            {!isOtherwise && (
-              <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-            )}
+            {!isOtherwise && <GripVertical className='w-4 h-4 text-gray-400 cursor-move' />}
 
-            <div className="flex-1">
+            <div className='flex-1'>
               {isEditing ? (
-                <div className="flex items-center gap-2">
+                <div className='flex items-center gap-2'>
                   <input
-                    type="text"
+                    type='text'
                     value={editingName}
                     onChange={(e) => setEditingName(e.target.value)}
-                    className="flex-1 px-2 py-1 text-sm border rounded"
+                    className='flex-1 px-2 py-1 text-sm border rounded'
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSaveEdit(index)
@@ -88,33 +84,33 @@ export const BranchesList: React.FC<BranchesListProps> = ({
                       e.stopPropagation()
                       handleSaveEdit(index)
                     }}
-                    className="p-1 text-green-600 hover:bg-green-50 rounded"
+                    className='p-1 text-green-600 hover:bg-green-50 rounded'
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className='w-4 h-4' />
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       handleCancelEdit()
                     }}
-                    className="p-1 text-red-600 hover:bg-red-50 rounded"
+                    className='p-1 text-red-600 hover:bg-red-50 rounded'
                   >
-                    <X className="w-4 h-4" />
+                    <X className='w-4 h-4' />
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{displayName}</span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium'>{displayName}</span>
                   {!isOtherwise && (
-                    <div className="flex items-center gap-1">
+                    <div className='flex items-center gap-1'>
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           handleStartEdit(index, displayName)
                         }}
-                        className="p-1 text-gray-600 hover:bg-gray-100 rounded"
+                        className='p-1 text-gray-600 hover:bg-gray-100 rounded'
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className='w-4 h-4' />
                       </button>
                       {step.settings.branches.length > 1 && (
                         <button
@@ -122,9 +118,9 @@ export const BranchesList: React.FC<BranchesListProps> = ({
                             e.stopPropagation()
                             onDeleteBranch(index)
                           }}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          className='p-1 text-red-600 hover:bg-red-50 rounded'
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className='w-4 h-4' />
                         </button>
                       )}
                     </div>

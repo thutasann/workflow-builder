@@ -44,28 +44,21 @@ export const RightPanel: React.FC = () => {
   if (!selectedStep || !step) return null
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-white border-l border-gray-200 shadow-lg z-50">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold">
-          {step.displayName} Settings
-        </h2>
-        <button
-          onClick={handleClose}
-          className="p-1 rounded hover:bg-gray-100 transition-colors"
-        >
-          <X className="w-5 h-5" />
+    <div className='fixed right-0 top-0 h-full w-96 bg-white border-l border-gray-200 shadow-lg z-50'>
+      <div className='flex items-center justify-between p-4 border-b border-gray-200'>
+        <h2 className='text-lg font-semibold'>{step.displayName} Settings</h2>
+        <button onClick={handleClose} className='p-1 rounded hover:bg-gray-100 transition-colors'>
+          <X className='w-5 h-5' />
         </button>
       </div>
 
-      <div className="p-4 overflow-y-auto h-[calc(100%-73px)]">
+      <div className='p-4 overflow-y-auto h-[calc(100%-73px)]'>
         {step.type === FlowActionType.ROUTER ? (
           <RouterSettings step={step} />
         ) : step.type === FlowActionType.LOOP_ON_ITEMS ? (
           <LoopSettings step={step} />
         ) : (
-          <div className="text-gray-500">
-            Settings for {step.displayName} will be implemented here
-          </div>
+          <div className='text-gray-500'>Settings for {step.displayName} will be implemented here</div>
         )}
       </div>
     </div>

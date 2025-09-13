@@ -24,9 +24,9 @@ const createBigAddButtonGraph = (parentStep: LoopOnItemsAction | RouterAction, n
   const bigAddButtonNode: ApBigAddButtonNode = {
     id: `${parentStep.name}-big-add-button-${nodeData.edgeId}`,
     type: ApNodeType.BIG_ADD_BUTTON,
-    position: { 
-      x: (flowConstants.AP_NODE_SIZE.step.width - flowConstants.AP_NODE_SIZE.bigAddButton.width) / 2, 
-      y: 0 
+    position: {
+      x: (flowConstants.AP_NODE_SIZE.step.width - flowConstants.AP_NODE_SIZE.bigAddButton.width) / 2,
+      y: 0,
     },
     data: nodeData,
     selectable: false,
@@ -209,11 +209,12 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
   // Create router start edges for each branch
   const routerStartEdges: ApEdge[] = childGraphsAfterOffset.map((childGraph, index) => {
     const firstNode = childGraph.nodes[0]
-    
+
     // Get branch label from settings or use default
-    const branchLabel = step.settings.branches[index]?.branchName ?? 
+    const branchLabel =
+      step.settings.branches[index]?.branchName ??
       (index === childGraphsAfterOffset.length - 1 ? 'Otherwise' : `Branch ${index + 1}`)
-    
+
     return {
       id: `${step.name}-branch-${index}-start-edge`,
       source: step.name,
@@ -233,7 +234,7 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
   // Create router end edges for each branch
   const routerEndEdges: ApEdge[] = childGraphsAfterOffset.map((childGraph, index) => {
     const lastNode = childGraph.nodes[childGraph.nodes.length - 1]
-    
+
     return {
       id: `${step.name}-branch-${index}-end-edge`,
       source: lastNode.id,
@@ -242,10 +243,10 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
       data: {
         routerOrBranchStepName: step.name,
         drawEndingVerticalLine: index === 0,
-        verticalSpaceBetweenLastNodeInBranchAndEndLine: 
-          subgraphEndNode.position.y - 
-          lastNode.position.y - 
-          flowConstants.VERTICAL_SPACE_BETWEEN_STEPS - 
+        verticalSpaceBetweenLastNodeInBranchAndEndLine:
+          subgraphEndNode.position.y -
+          lastNode.position.y -
+          flowConstants.VERTICAL_SPACE_BETWEEN_STEPS -
           flowConstants.ARC_LENGTH,
         drawHorizontalLine: index === 0 || index === childGraphsAfterOffset.length - 1,
         isNextStepEmpty: !step.nextAction,
@@ -255,11 +256,7 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
 
   return {
     nodes: [...childGraphsAfterOffset.map((cg) => cg.nodes).flat(), subgraphEndNode],
-    edges: [
-      ...childGraphsAfterOffset.map((cg) => cg.edges).flat(),
-      ...routerStartEdges,
-      ...routerEndEdges,
-    ],
+    edges: [...childGraphsAfterOffset.map((cg) => cg.edges).flat(), ...routerStartEdges, ...routerEndEdges],
   }
 }
 
@@ -274,7 +271,7 @@ const buildLoopChildGraph = (step: LoopOnItemsAction): ApGraph => {
       })
 
   const childGraphBoundingBox = calculateGraphBoundingBox(childGraph)
-  
+
   // Calculate deltaLeftX as in ActivePieces
   const deltaLeftX =
     -(
@@ -294,11 +291,9 @@ const buildLoopChildGraph = (step: LoopOnItemsAction): ApGraph => {
       flowConstants.AP_NODE_SIZE.step.width +
       flowConstants.HORIZONTAL_SPACE_BETWEEN_NODES +
       childGraphBoundingBox.left,
-    y:
-      flowConstants.VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD +
-      flowConstants.AP_NODE_SIZE.step.height,
+    y: flowConstants.VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD + flowConstants.AP_NODE_SIZE.step.height,
   })
-  
+
   // Create loop return node
   const loopReturnNode: ApLoopReturnNode = {
     id: `${step.name}-loop-return-node`,
@@ -353,7 +348,7 @@ const buildLoopChildGraph = (step: LoopOnItemsAction): ApGraph => {
       parentStepName: step.name,
       isLoopEmpty: !step.firstLoopAction,
       drawArrowHeadAfterEnd: !step.nextAction,
-      verticalSpaceBetweenReturnNodeStartAndEnd: 
+      verticalSpaceBetweenReturnNodeStartAndEnd:
         childGraphBoundingBox.height + flowConstants.VERTICAL_SPACE_BETWEEN_STEPS,
     },
   }

@@ -81,7 +81,6 @@ export const ApRouterEndEdge = ({ sourceX, sourceY, targetX, targetY, data }: Ed
     })
   }
 
-
   return (
     <>
       <BaseEdge

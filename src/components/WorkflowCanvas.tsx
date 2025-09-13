@@ -48,17 +48,8 @@ const apEdgeTypes = {
   custom: CustomEdge,
 }
 
-
 const WorkflowCanvasContent: React.FC = () => {
-  const {
-    graph,
-    selectStep,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    setSelectedNode,
-    setSelectedEdge,
-  } = useWorkflow()
+  const { graph, selectStep, onNodesChange, onEdgesChange, onConnect, setSelectedNode, setSelectedEdge } = useWorkflow()
 
   // Convert our graph to React Flow format (memoized to prevent infinite loops)
   const { nodes, edges } = useMemo(() => {

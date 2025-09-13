@@ -1,11 +1,11 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react'
-import { ChevronDown } from 'lucide-react'
-import React, { useMemo } from 'react'
+import { ChevronDown, Trash2 } from 'lucide-react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useWorkflow } from '../../context/WorkflowContext'
 import { cn } from '../../lib/utils'
 import type { ApStepNode as ApStepNodeType } from '../../types/workflow.types'
-import { FlowTriggerType, FlowActionType } from '../../types/workflow.types'
+import { FlowActionType, FlowTriggerType } from '../../types/workflow.types'
 import { flowConstants } from '../../utils/flowConstants'
 
 // Helper function to check if step is trigger
@@ -14,10 +14,29 @@ const isTrigger = (stepType: string) => {
 }
 
 export const ApStepNode = React.memo(({ data: { step } }: NodeProps & Omit<ApStepNodeType, 'position'>) => {
-  const { selectedStep, selectStep, flowVersion } = useWorkflow()
+  const { selectedStep, selectStep, flowVersion, deleteStep } = useWorkflow()
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const isSelected = selectedStep === step.name
   const isTriggerStep = isTrigger(step.type)
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showDropdown])
 
   // Calculate step index for numbering
   const stepIndex = useMemo(() => {
@@ -38,6 +57,9 @@ export const ApStepNode = React.memo(({ data: { step } }: NodeProps & Omit<ApSte
     }
     if (step.type === FlowActionType.ROUTER) {
       return '🔀' // Router icon
+    }
+    if (step.type === FlowActionType.LOOP_ON_ITEMS) {
+      return '🔁' // Loop icon
     }
     return '🔧' // Tool for actions
   }
@@ -60,7 +82,7 @@ export const ApStepNode = React.memo(({ data: { step } }: NodeProps & Omit<ApSte
           'border-primary/70': isSelected,
           'shadow-sm': true,
         },
-        getStepColor(),
+        getStepColor()
       )}
       onClick={handleStepClick}
     >
@@ -99,16 +121,43 @@ export const ApStepNode = React.memo(({ data: { step } }: NodeProps & Omit<ApSte
               </div>
 
               {/* Action button */}
-              <button
-                className='p-1 size-7 hover:bg-gray-100 rounded transition-colors'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  // Handle context menu or actions
-                }}
-              >
-                <ChevronDown className='w-4 h-4 stroke-gray-500' />
-              </button>
+              <div className='relative'>
+                <button
+                  className='p-1 size-7 hover:bg-gray-100 rounded transition-colors'
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    setShowDropdown(!showDropdown)
+                  }}
+                >
+                  <ChevronDown className='w-4 h-4 stroke-gray-500' />
+                </button>
+
+                {/* Dropdown menu */}
+                {showDropdown && (
+                  <div
+                    ref={dropdownRef}
+                    className='fixed right-0 top-8 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[120px]'
+                  >
+                    {!isTriggerStep && (
+                      <button
+                        className='w-full px-3 py-2 text-sm text-left hover:bg-red-50 flex items-center gap-2 text-red-600 transition-colors'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          e.preventDefault()
+                          setShowDropdown(false)
+
+                          // Simple confirmation
+                          deleteStep(step.name)
+                        }}
+                      >
+                        <Trash2 className='w-4 h-4' />
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className='flex justify-between w-full items-center'>

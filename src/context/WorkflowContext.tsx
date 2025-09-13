@@ -1,13 +1,13 @@
-import React, { createContext, useCallback, useContext, useState, useMemo, type ReactNode } from 'react'
+import React, { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type {
-  FlowVersion,
-  FlowTrigger,
-  FlowAction,
   ApGraph,
-  RouterAction,
+  FlowAction,
+  FlowTrigger,
+  FlowVersion,
   LoopOnItemsAction,
+  RouterAction,
 } from '../types/workflow.types'
-import { FlowTriggerType, FlowActionType } from '../types/workflow.types'
+import { FlowActionType, FlowTriggerType } from '../types/workflow.types'
 import { convertFlowVersionToGraph } from '../utils/graphUtils'
 
 interface WorkflowContextType {
@@ -108,15 +108,17 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     setSelectedStep(null)
   }, [])
 
-
-  const openStepSelectorForStep = useCallback((parentStepName: string, position: { x: number; y: number }, branchIndex?: number) => {
-    setStepSelectorState({
-      isOpen: true,
-      position,
-      parentStepName,
-      branchIndex,
-    })
-  }, [])
+  const openStepSelectorForStep = useCallback(
+    (parentStepName: string, position: { x: number; y: number }, branchIndex?: number) => {
+      setStepSelectorState({
+        isOpen: true,
+        position,
+        parentStepName,
+        branchIndex,
+      })
+    },
+    [],
+  )
 
   const closeStepSelector = useCallback(() => {
     setStepSelectorState({
@@ -147,29 +149,30 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
           // Otherwise add as nextAction
           return { ...step, nextAction: action }
         }
-        
+
         // Recursively search in nextAction
         if ('nextAction' in step && step.nextAction) {
           return { ...step, nextAction: updateStep(step.nextAction) as FlowAction }
         }
-        
+
         // Recursively search in router branches
         if (step.type === FlowActionType.ROUTER) {
           const routerStep = step as RouterAction
-          const newChildren = routerStep.children.map((child) => 
-            child ? updateStep(child) as FlowAction : child
-          )
+          const newChildren = routerStep.children.map((child) => (child ? (updateStep(child) as FlowAction) : child))
           return { ...routerStep, children: newChildren } as RouterAction
         }
-        
+
         // Recursively search in loop
         if (step.type === FlowActionType.LOOP_ON_ITEMS) {
           const loopStep = step as LoopOnItemsAction
           if (loopStep.firstLoopAction) {
-            return { ...loopStep, firstLoopAction: updateStep(loopStep.firstLoopAction) as FlowAction } as LoopOnItemsAction
+            return {
+              ...loopStep,
+              firstLoopAction: updateStep(loopStep.firstLoopAction) as FlowAction,
+            } as LoopOnItemsAction
           }
         }
-        
+
         return step
       }
 
@@ -193,30 +196,30 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         if (step.name === stepName) {
           return { ...step, ...updates }
         }
-        
+
         // Recursively search in nextAction
         if ('nextAction' in step && step.nextAction) {
           return { ...step, nextAction: updateStepRecursive(step.nextAction) as FlowAction }
         }
-        
+
         // Recursively search in router branches
         if (step.type === FlowActionType.ROUTER) {
           const routerStep = step as RouterAction
-          const newChildren = routerStep.children.map((child) => 
-            child ? updateStepRecursive(child) as FlowAction : child
+          const newChildren = routerStep.children.map((child) =>
+            child ? (updateStepRecursive(child) as FlowAction) : child,
           )
           return { ...routerStep, children: newChildren } as RouterAction
         }
-        
+
         // Recursively search in loop
         if (step.type === FlowActionType.LOOP_ON_ITEMS) {
           const loopStep = step as LoopOnItemsAction
-          const updatedFirstLoopAction = loopStep.firstLoopAction 
-            ? updateStepRecursive(loopStep.firstLoopAction) as FlowAction
+          const updatedFirstLoopAction = loopStep.firstLoopAction
+            ? (updateStepRecursive(loopStep.firstLoopAction) as FlowAction)
             : undefined
           return { ...loopStep, firstLoopAction: updatedFirstLoopAction } as LoopOnItemsAction
         }
-        
+
         return step
       }
 
@@ -229,14 +232,40 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
 
   const deleteStep = useCallback((stepName: string) => {
     setFlowVersion((prev) => {
-      const deleteStepRecursive = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger | undefined => {
-        if ('nextAction' in step && step.nextAction?.name === stepName) {
-          return { ...step, nextAction: step.nextAction.nextAction }
+      const deleteStepRecursive = (
+        step: FlowAction | FlowTrigger | undefined,
+      ): FlowAction | FlowTrigger | undefined => {
+        if (!step) return undefined
+
+        // If this is the step to delete, return its nextAction
+        if (step.name === stepName) {
+          return 'nextAction' in step ? step.nextAction : undefined
         }
+
+        // Check nextAction
         if ('nextAction' in step && step.nextAction) {
           const updatedNext = deleteStepRecursive(step.nextAction)
-          return { ...step, nextAction: updatedNext as FlowAction }
+          step = { ...step, nextAction: updatedNext as FlowAction }
         }
+
+        // Check router branches
+        if (step.type === FlowActionType.ROUTER) {
+          const routerStep = step as RouterAction
+          const newChildren = routerStep.children.map((child) =>
+            child ? (deleteStepRecursive(child) as FlowAction) : child,
+          )
+          return { ...routerStep, children: newChildren } as RouterAction
+        }
+
+        // Check loop firstLoopAction
+        if (step.type === FlowActionType.LOOP_ON_ITEMS) {
+          const loopStep = step as LoopOnItemsAction
+          const updatedFirstLoopAction = loopStep.firstLoopAction
+            ? (deleteStepRecursive(loopStep.firstLoopAction) as FlowAction)
+            : undefined
+          return { ...loopStep, firstLoopAction: updatedFirstLoopAction } as LoopOnItemsAction
+        }
+
         return step
       }
 
@@ -246,6 +275,9 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         trigger: updatedTrigger,
       }
     })
+
+    // Clear selection if the deleted step was selected
+    setSelectedStep((current) => (current === stepName ? null : current))
   }, [])
 
   const selectStep = useCallback((stepName: string | null) => {

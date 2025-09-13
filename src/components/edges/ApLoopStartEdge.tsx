@@ -30,40 +30,26 @@ const AddButton: React.FC<AddButtonProps> = ({ x, y, onAddStep }) => {
   )
 }
 
-export const ApLoopStartEdge = ({
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  data,
-  source,
-  id,
-}: EdgeProps) => {
+export const ApLoopStartEdge = ({ sourceX, sourceY, targetX, targetY, data, source, id }: EdgeProps) => {
   const { openStepSelectorForStep } = useWorkflow()
   const loopData = data as ApLoopStartEdgeType['data']
-  
+
   const startY = sourceY + flowConstants.VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
   const verticalLineLength =
-    flowConstants.VERTICAL_SPACE_BETWEEN_STEPS -
-    2 * flowConstants.VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
+    flowConstants.VERTICAL_SPACE_BETWEEN_STEPS - 2 * flowConstants.VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
 
-  const horizontalLineLength =
-    Math.abs(targetX - sourceX) - 2 * flowConstants.ARC_LENGTH
-  
+  const horizontalLineLength = Math.abs(targetX - sourceX) - 2 * flowConstants.ARC_LENGTH
+
   const path = `M ${sourceX} ${startY} v${verticalLineLength / 2}
   ${flowConstants.ARC_RIGHT_DOWN} h${horizontalLineLength}
   ${flowConstants.ARC_RIGHT} v${verticalLineLength}
    ${!loopData.isLoopEmpty ? flowConstants.ARROW_DOWN : ''}`
 
   const buttonPosition = {
-    x:
-      sourceX -
-      flowConstants.AP_NODE_SIZE.ADD_BUTTON.width / 2 +
-      horizontalLineLength +
-      flowConstants.ARC_LENGTH * 2,
+    x: sourceX - flowConstants.AP_NODE_SIZE.ADD_BUTTON.width / 2 + horizontalLineLength + flowConstants.ARC_LENGTH * 2,
     y: startY + verticalLineLength + flowConstants.ARC_LENGTH,
   }
-  
+
   const handleAddStep = () => {
     openStepSelectorForStep(source, {
       x: buttonPosition.x + flowConstants.AP_NODE_SIZE.ADD_BUTTON.width / 2,
@@ -75,11 +61,11 @@ export const ApLoopStartEdge = ({
     <>
       <BaseEdge
         path={path}
-        style={{ 
-          strokeWidth: `${flowConstants.LINE_WIDTH}px`
+        style={{
+          strokeWidth: `${flowConstants.LINE_WIDTH}px`,
         }}
       />
-      
+
       {!loopData.isLoopEmpty && (
         <AddButton
           x={buttonPosition.x + flowConstants.AP_NODE_SIZE.ADD_BUTTON.width / 2}
