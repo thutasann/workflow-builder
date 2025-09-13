@@ -320,7 +320,12 @@ const buildLoopChildGraph = (step: LoopOnItemsAction): ApGraph => {
     type: ApNodeType.GRAPH_END_WIDGET,
     position: {
       x: flowConstants.AP_NODE_SIZE.step.width / 2,
-      y: loopReturnNode.position.y + flowConstants.VERTICAL_SPACE_BETWEEN_STEPS,
+      y:
+        flowConstants.AP_NODE_SIZE.step.height +
+        flowConstants.VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD +
+        childGraphBoundingBox.height +
+        flowConstants.ARC_LENGTH +
+        flowConstants.VERTICAL_SPACE_BETWEEN_STEPS,
     },
     data: {},
     selectable: false,
@@ -354,8 +359,8 @@ const buildLoopChildGraph = (step: LoopOnItemsAction): ApGraph => {
   }
 
   return {
-    nodes: [...childGraphAfterOffset.nodes, loopReturnNode, subgraphEndNode],
-    edges: [...childGraphAfterOffset.edges, loopStartEdge, loopReturnEdge],
+    nodes: [loopReturnNode, ...childGraphAfterOffset.nodes, subgraphEndNode],
+    edges: [loopStartEdge, loopReturnEdge, ...childGraphAfterOffset.edges],
   }
 }
 
