@@ -13,8 +13,8 @@ export enum ApEdgeType {
   STRAIGHT_LINE = 'straightLine',
   LOOP_START_EDGE = 'loopStart',
   LOOP_RETURN_EDGE = 'loopReturn',
-  ROUTER_START_EDGE = 'routerStart',
-  ROUTER_END_EDGE = 'routerEnd',
+  ROUTER_START_EDGE = 'routerStartEdge',
+  ROUTER_END_EDGE = 'routerEndEdge',
 }
 
 // Flow Action Types (from ActivePieces)

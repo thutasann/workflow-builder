@@ -10,6 +10,7 @@ import {
   type ApStraightLineEdge,
   type ApBigAddButtonNode,
   type ApButtonData,
+  type ApEdge,
   ApNodeType,
   ApEdgeType,
   FlowActionType,
@@ -64,7 +65,7 @@ const createStepGraph = (step: FlowAction | FlowTrigger, graphHeight: number): A
   const stepNode: ApStepNode = {
     id: step.name,
     type: ApNodeType.STEP,
-    position: { x: 400, y: 100 }, // Center the node properly
+    position: { x: 0, y: 0 },
     data: {
       step,
     },
@@ -79,8 +80,8 @@ const createStepGraph = (step: FlowAction | FlowTrigger, graphHeight: number): A
     id: `${step.name}-subgraph-end`,
     type: ApNodeType.GRAPH_END_WIDGET,
     position: {
-      x: 400 + flowConstants.AP_NODE_SIZE.step.width / 2 - 16, // Center align with step node (assuming end widget is ~32px wide)
-      y: 100 + graphHeight,
+      x: flowConstants.AP_NODE_SIZE.step.width / 2,
+      y: graphHeight,
     },
     data: {},
     selectable: false,
@@ -201,9 +202,60 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
     selectable: false,
   }
 
+  // Create router start edges for each branch
+  const routerStartEdges: ApEdge[] = childGraphsAfterOffset.map((childGraph, index) => {
+    const firstNode = childGraph.nodes[0]
+    
+    // Get branch label from settings or use default
+    const branchLabel = step.settings.branches[index]?.branchName ?? 
+      (index === childGraphsAfterOffset.length - 1 ? 'Otherwise' : `Branch ${index + 1}`)
+    
+    return {
+      id: `${step.name}-branch-${index}-start-edge`,
+      source: step.name,
+      target: firstNode.id,
+      type: ApEdgeType.ROUTER_START_EDGE,
+      data: {
+        label: branchLabel,
+        branchIndex: index,
+        stepLocationRelativeToParent: StepLocationRelativeToParent.INSIDE_BRANCH,
+        isBranchEmpty: firstNode.type === ApNodeType.BIG_ADD_BUTTON,
+        drawStartingVerticalLine: index === 0,
+        drawHorizontalLine: index === 0 || index === childGraphsAfterOffset.length - 1,
+      },
+    }
+  })
+
+  // Create router end edges for each branch
+  const routerEndEdges: ApEdge[] = childGraphsAfterOffset.map((childGraph, index) => {
+    const lastNode = childGraph.nodes[childGraph.nodes.length - 1]
+    
+    return {
+      id: `${step.name}-branch-${index}-end-edge`,
+      source: lastNode.id,
+      target: subgraphEndNode.id,
+      type: ApEdgeType.ROUTER_END_EDGE,
+      data: {
+        routerOrBranchStepName: step.name,
+        drawEndingVerticalLine: index === 0,
+        verticalSpaceBetweenLastNodeInBranchAndEndLine: 
+          subgraphEndNode.position.y - 
+          lastNode.position.y - 
+          flowConstants.VERTICAL_SPACE_BETWEEN_STEPS - 
+          flowConstants.ARC_LENGTH,
+        drawHorizontalLine: index === 0 || index === childGraphsAfterOffset.length - 1,
+        isNextStepEmpty: !step.nextAction,
+      },
+    }
+  })
+
   return {
     nodes: [...childGraphsAfterOffset.map((cg) => cg.nodes).flat(), subgraphEndNode],
-    edges: [...childGraphsAfterOffset.map((cg) => cg.edges).flat()],
+    edges: [
+      ...childGraphsAfterOffset.map((cg) => cg.edges).flat(),
+      ...routerStartEdges,
+      ...routerEndEdges,
+    ],
   }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useWorkflow } from '../context/WorkflowContext'
-import { FlowActionType } from '../types/workflow.types'
+import { FlowActionType, BranchExecutionType } from '../types/workflow.types'
 import { StepSelector } from './StepSelector'
 
 export const StepSelectorHandler: React.FC = () => {
@@ -26,11 +26,24 @@ export const StepSelectorHandler: React.FC = () => {
     }
 
     // Create new action
-    const newAction = {
+    let newAction: any = {
       name: `step-${Date.now()}`,
       displayName: option.label,
       type: actionType,
       settings: {},
+    }
+
+    // For routers, add the children array with 2 branches (Branch 1 and Otherwise)
+    if (actionType === FlowActionType.ROUTER) {
+      newAction = {
+        ...newAction,
+        settings: {
+          branches: [
+            { branchName: 'Branch 1', branchType: BranchExecutionType.CONDITION },
+          ]
+        },
+        children: [undefined, undefined] // 1 condition + 1 otherwise
+      }
     }
 
     // Add the action to the workflow

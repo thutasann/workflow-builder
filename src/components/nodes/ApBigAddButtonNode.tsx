@@ -1,4 +1,4 @@
-import { type NodeProps } from '@xyflow/react'
+import { Handle, Position, type NodeProps } from '@xyflow/react'
 import { Plus } from 'lucide-react'
 import React from 'react'
 
@@ -45,7 +45,7 @@ export const ApBigAddButtonNode = React.memo(({ data }: NodeProps & Omit<ApBigAd
         width: `${flowConstants.AP_NODE_SIZE.bigAddButton.width}px`,
         height: `${flowConstants.AP_NODE_SIZE.bigAddButton.height}px`,
       }}
-      className='group'
+      className='group relative'
     >
       <button
         onClick={handleClick}
@@ -53,6 +53,10 @@ export const ApBigAddButtonNode = React.memo(({ data }: NodeProps & Omit<ApBigAd
       >
         <Plus className='w-6 h-6' />
       </button>
+      
+      {/* React Flow handles */}
+      <Handle type='source' style={flowConstants.HANDLE_STYLING} position={Position.Bottom} />
+      <Handle type='target' style={flowConstants.HANDLE_STYLING} position={Position.Top} />
     </div>
   )
 })

@@ -21,6 +21,8 @@ import { ApGraphEndNode } from './nodes/ApGraphEndNode'
 import { ApStepNode } from './nodes/ApStepNode'
 
 // Edge components
+import { ApRouterStartEdge } from './edges/ApRouterStartEdge'
+import { ApRouterEndEdge } from './edges/ApRouterEndEdge'
 import { CustomEdge } from './edges/CustomEdge'
 import { StepSelectorHandler } from './StepSelectorHandler'
 import { WorkflowHeader } from './WorkflowHeader'
@@ -34,8 +36,11 @@ const apNodeTypes = {
 
 const apEdgeTypes = {
   [ApEdgeType.STRAIGHT_LINE]: ApStraightLineEdge,
+  [ApEdgeType.ROUTER_START_EDGE]: ApRouterStartEdge,
+  [ApEdgeType.ROUTER_END_EDGE]: ApRouterEndEdge,
   custom: CustomEdge,
 }
+
 
 const WorkflowCanvasContent: React.FC = () => {
   const {
@@ -61,7 +66,8 @@ const WorkflowCanvasContent: React.FC = () => {
   const { setViewport } = useReactFlow()
 
   useEffect(() => {
-    setViewport({ x: 100, y: 100, zoom: 1 })
+    // Center the workflow like ActivePieces
+    setViewport({ x: 400, y: 100, zoom: 1 })
   }, [setViewport])
 
   const onNodeClick = useCallback(
@@ -109,11 +115,7 @@ const WorkflowCanvasContent: React.FC = () => {
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={true}
-        fitView
-        fitViewOptions={{
-          padding: 0.2,
-          includeHiddenNodes: false,
-        }}
+        fitView={false}
         proOptions={{ hideAttribution: true }}
       >
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} color='#e5e7eb' />

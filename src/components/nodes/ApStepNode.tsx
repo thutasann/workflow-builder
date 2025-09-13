@@ -5,7 +5,7 @@ import React, { useMemo } from 'react'
 import { useWorkflow } from '../../context/WorkflowContext'
 import { cn } from '../../lib/utils'
 import type { ApStepNode as ApStepNodeType } from '../../types/workflow.types'
-import { FlowTriggerType } from '../../types/workflow.types'
+import { FlowTriggerType, FlowActionType } from '../../types/workflow.types'
 import { flowConstants } from '../../utils/flowConstants'
 
 // Helper function to check if step is trigger
@@ -35,6 +35,9 @@ export const ApStepNode = React.memo(({ data: { step } }: NodeProps & Omit<ApSte
   const getStepIcon = () => {
     if (isTriggerStep) {
       return '⚡' // Lightning bolt for trigger
+    }
+    if (step.type === FlowActionType.ROUTER) {
+      return '🔀' // Router icon
     }
     return '🔧' // Tool for actions
   }
