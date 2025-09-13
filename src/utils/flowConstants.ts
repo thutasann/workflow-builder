@@ -18,7 +18,7 @@ const LABEL_HEIGHT = 30
 const LABEL_VERTICAL_PADDING = 12
 const VERTICAL_OFFSET_BETWEEN_ROUTER_AND_CHILD = VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD + LABEL_HEIGHT
 const LINE_WIDTH = 1.5
-const HORIZONTAL_SPACE_BETWEEN_NODES = 80
+const HORIZONTAL_SPACE_BETWEEN_NODES = 120
 
 // Node size constants (ActivePieces dimensions)
 const AP_NODE_SIZE = {
@@ -85,7 +85,7 @@ export const flowConstants = {
 export const LAYOUT_CONFIG = {
   centerX: 130, // Center position for nodes (updated from ActivePieces analysis)
   nodeSpacing: VERTICAL_SPACE_BETWEEN_STEPS,
-  branchSpacing: HORIZONTAL_SPACE_BETWEEN_NODES,
+  branchSpacing: HORIZONTAL_SPACE_BETWEEN_NODES, // Now 120px for better spacing
   nodeWidth: 260,
   nodeHeight: 70,
 }
