@@ -4,8 +4,9 @@ import type {
   FlowTrigger,
   FlowAction,
   ApGraph,
+  RouterAction,
 } from '../types/workflow.types'
-import { FlowTriggerType } from '../types/workflow.types'
+import { FlowTriggerType, FlowActionType } from '../types/workflow.types'
 import { convertFlowVersionToGraph } from '../utils/graphUtils'
 
 interface WorkflowContextType {
@@ -18,16 +19,17 @@ interface WorkflowContextType {
     isOpen: boolean
     position: { x: number; y: number }
     parentStepName: string | null
+    branchIndex?: number
   }
 
   // Graph operations
-  addAction: (parentStepName: string, action: FlowAction) => void
+  addAction: (parentStepName: string, action: FlowAction, branchIndex?: number) => void
   addTrigger: (trigger: FlowTrigger) => void
   updateStep: (stepName: string, updates: Partial<FlowAction | FlowTrigger>) => void
   deleteStep: (stepName: string) => void
   selectStep: (stepName: string | null) => void
   clearWorkflow: () => void
-  openStepSelectorForStep: (parentStepName: string, position: { x: number; y: number }) => void
+  openStepSelectorForStep: (parentStepName: string, position: { x: number; y: number }, branchIndex?: number) => void
   closeStepSelector: () => void
 
   // Temporary React Flow compatibility
@@ -81,10 +83,16 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
     }
   }, [flowVersion.trigger])
 
-  const [stepSelectorState, setStepSelectorState] = useState({
+  const [stepSelectorState, setStepSelectorState] = useState<{
+    isOpen: boolean
+    position: { x: number; y: number }
+    parentStepName: string | null
+    branchIndex?: number
+  }>({
     isOpen: false,
     position: { x: 0, y: 0 },
-    parentStepName: null as string | null,
+    parentStepName: null,
+    branchIndex: undefined,
   })
 
   // Temporary React Flow compatibility - no-op functions
@@ -100,11 +108,12 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
   }, [])
 
 
-  const openStepSelectorForStep = useCallback((parentStepName: string, position: { x: number; y: number }) => {
+  const openStepSelectorForStep = useCallback((parentStepName: string, position: { x: number; y: number }, branchIndex?: number) => {
     setStepSelectorState({
       isOpen: true,
       position,
       parentStepName,
+      branchIndex,
     })
   }, [])
 
@@ -117,16 +126,36 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
   }, [])
 
   // Graph-based operations
-  const addAction = useCallback((parentStepName: string, action: FlowAction) => {
+  const addAction = useCallback((parentStepName: string, action: FlowAction, branchIndex?: number) => {
     setFlowVersion((prev) => {
-      // Find the parent step and add the action as nextAction
+      // Find the parent step and add the action
       const updateStep = (step: FlowAction | FlowTrigger): FlowAction | FlowTrigger => {
         if (step.name === parentStepName) {
+          // If it's a router and we have a branch index, add to that branch
+          if (step.type === FlowActionType.ROUTER && branchIndex !== undefined) {
+            const routerStep = step as RouterAction
+            const newChildren = [...routerStep.children]
+            newChildren[branchIndex] = action
+            return { ...routerStep, children: newChildren } as RouterAction
+          }
+          // Otherwise add as nextAction
           return { ...step, nextAction: action }
         }
+        
+        // Recursively search in nextAction
         if ('nextAction' in step && step.nextAction) {
           return { ...step, nextAction: updateStep(step.nextAction) as FlowAction }
         }
+        
+        // Recursively search in router branches
+        if (step.type === FlowActionType.ROUTER) {
+          const routerStep = step as RouterAction
+          const newChildren = routerStep.children.map((child) => 
+            child ? updateStep(child) as FlowAction : child
+          )
+          return { ...routerStep, children: newChildren } as RouterAction
+        }
+        
         return step
       }
 

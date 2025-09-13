@@ -47,7 +47,7 @@ export const StepSelectorHandler: React.FC = () => {
     }
 
     // Add the action to the workflow
-    addAction(stepSelectorState.parentStepName, newAction)
+    addAction(stepSelectorState.parentStepName, newAction, stepSelectorState.branchIndex)
     closeStepSelector()
   }
 
