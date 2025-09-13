@@ -1,7 +1,34 @@
 import { BaseEdge, type EdgeProps } from '@xyflow/react'
+import React from 'react'
 
+import { useWorkflow } from '../../context/WorkflowContext'
 import { flowConstants } from '../../utils/flowConstants'
 import type { ApRouterEndEdge as ApRouterEndEdgeType } from '../../types/workflow.types'
+
+interface AddButtonProps {
+  x: number
+  y: number
+  onAddStep: () => void
+}
+
+const AddButton: React.FC<AddButtonProps> = ({ x, y, onAddStep }) => {
+  return (
+    <foreignObject
+      x={x - flowConstants.AP_NODE_SIZE.ADD_BUTTON.width / 2}
+      y={y - flowConstants.AP_NODE_SIZE.ADD_BUTTON.height / 2}
+      width={flowConstants.AP_NODE_SIZE.ADD_BUTTON.width}
+      height={flowConstants.AP_NODE_SIZE.ADD_BUTTON.height}
+      className="overflow-visible"
+    >
+      <button
+        className="w-full h-full bg-white border-2 border-blue-500 rounded-full flex items-center justify-center text-blue-500 hover:bg-blue-50 transition-colors text-sm font-bold shadow-sm"
+        onClick={onAddStep}
+      >
+        +
+      </button>
+    </foreignObject>
+  )
+}
 
 export const ApRouterEndEdge = ({
   sourceX,
@@ -10,6 +37,7 @@ export const ApRouterEndEdge = ({
   targetY,
   data,
 }: EdgeProps) => {
+  const { openStepSelectorForStep } = useWorkflow()
   const routerData = data as ApRouterEndEdgeType['data']
   
   const verticalLineLength =
@@ -64,13 +92,30 @@ export const ApRouterEndEdge = ({
   }
 
   const path = generatePath()
+  
+  const handleAddStep = () => {
+    openStepSelectorForStep(routerData.routerOrBranchStepName, {
+      x: targetX,
+      y: targetY - verticalLineLength / 2,
+    })
+  }
 
   return (
-    <BaseEdge
-      path={path}
-      style={{ 
-        strokeWidth: `${flowConstants.LINE_WIDTH}px`,
-      }}
-    />
+    <>
+      <BaseEdge
+        path={path}
+        style={{ 
+          strokeWidth: `${flowConstants.LINE_WIDTH}px`
+        }}
+      />
+      
+      {routerData.drawEndingVerticalLine && (
+        <AddButton
+          x={targetX - flowConstants.LINE_WIDTH / 2}
+          y={targetY - verticalLineLength + flowConstants.AP_NODE_SIZE.ADD_BUTTON.height}
+          onAddStep={handleAddStep}
+        />
+      )}
+    </>
   )
 }

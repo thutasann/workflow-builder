@@ -1,41 +1,42 @@
 import { type NodeProps, Handle, Position } from '@xyflow/react'
-import { Flag } from 'lucide-react'
-import React from 'react'
+import React, { useRef } from 'react'
 
 import type { ApGraphEndNode as ApGraphEndNodeType } from '../../types/workflow.types'
 import { flowConstants } from '../../utils/flowConstants'
 
 /**
  * ApGraphEndNode - Invisible node that marks the end of a graph/subgraph
- * Used for positioning and layout calculations, usually not visible to users
+ * Shows "End" widget when data.showWidget is true
  */
 export const ApGraphEndNode = React.memo(({ data }: NodeProps & Omit<ApGraphEndNodeType, 'position'>) => {
-  // Only show the widget if explicitly requested
-  if (!data.showWidget) {
-    return (
-      <div
-        style={{
-          width: '0px',
-          height: '0px',
-          position: 'absolute',
-          pointerEvents: 'none',
-        }}
-      >
-        {/* Always include the target handle for edges to connect to */}
-        <Handle type='target' style={flowConstants.HANDLE_STYLING} position={Position.Top} />
-      </div>
-    )
-  }
-
-  // Show end widget for the main flow
+  const elementRef = useRef<HTMLDivElement>(null)
+  
   return (
-    <div className='flex items-center justify-center relative'>
-      <div className='bg-gray-100 border border-gray-300 rounded-full p-2 text-gray-500'>
-        <Flag className='w-4 h-4' />
+    <>
+      <div className="h-[1px] w-[1px] relative">
+        {data.showWidget && (
+          <div
+            ref={elementRef}
+            style={{ left: `-${(elementRef.current?.clientWidth || 0) / 2}px` }}
+            className="px-2.5 absolute py-1.5 bg-accent text-foreground/70 rounded-full animate-fade"
+            key={'flow-end-button'}
+          >
+            End
+          </div>
+        )}
       </div>
-      {/* Target handle for edges */}
-      <Handle type='target' style={flowConstants.HANDLE_STYLING} position={Position.Top} />
-    </div>
+
+      <Handle
+        type="target"
+        position={Position.Top}
+        style={flowConstants.HANDLE_STYLING}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        style={flowConstants.HANDLE_STYLING}
+      />
+    </>
   )
 })
 

@@ -23,7 +23,10 @@ const createBigAddButtonGraph = (parentStep: LoopOnItemsAction | RouterAction, n
   const bigAddButtonNode: ApBigAddButtonNode = {
     id: `${parentStep.name}-big-add-button-${nodeData.edgeId}`,
     type: ApNodeType.BIG_ADD_BUTTON,
-    position: { x: 0, y: 0 },
+    position: { 
+      x: (flowConstants.AP_NODE_SIZE.step.width - flowConstants.AP_NODE_SIZE.bigAddButton.width) / 2, 
+      y: 0 
+    },
     data: nodeData,
     selectable: false,
     style: {
@@ -321,8 +324,24 @@ export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph 
 
   // Create edge between current step and next step if nextAction exists
   const interStepEdges: ApStraightLineEdge[] = []
-  if (step.nextAction && step.type !== FlowActionType.LOOP_ON_ITEMS && step.type !== FlowActionType.ROUTER) {
-    interStepEdges.push(createInterStepEdge(step, step.nextAction))
+  if (step.nextAction) {
+    if (step.type === FlowActionType.ROUTER) {
+      // For routers, connect the subgraph end to the next step
+      const routerEndNodeId = `${step.name}-branch-subgraph-end`
+      interStepEdges.push({
+        id: `${routerEndNodeId}-${step.nextAction.name}-edge`,
+        source: routerEndNodeId,
+        target: step.nextAction.name,
+        type: ApEdgeType.STRAIGHT_LINE,
+        data: {
+          drawArrowHead: false,
+          parentStepName: step.name,
+        },
+      })
+    } else if (step.type !== FlowActionType.LOOP_ON_ITEMS) {
+      // For normal steps, connect directly
+      interStepEdges.push(createInterStepEdge(step, step.nextAction))
+    }
   }
 
   const mergedGraph = mergeGraph(

@@ -109,7 +109,7 @@ export const ApRouterStartEdge = ({
       <BaseEdge
         path={path}
         style={{ 
-          strokeWidth: `${flowConstants.LINE_WIDTH}px`,
+          strokeWidth: `${flowConstants.LINE_WIDTH}px`
         }}
       />
 

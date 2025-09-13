@@ -27,12 +27,21 @@ body {
 }
 
 /* React Flow overrides */
+.react-flow {
+  --xy-edge-stroke-default: #b1b1b7 !important;
+  --xy-edge-stroke-selected-default: #b1b1b7 !important;
+}
+
 .react-flow__node {
   @apply cursor-pointer;
 }
 
 .react-flow__edge {
   @apply cursor-pointer;
+}
+
+.react-flow__edge.selectable > path {
+  pointer-events: none !important;
 }
 
 .react-flow__handle {

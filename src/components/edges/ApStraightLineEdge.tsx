@@ -1,4 +1,4 @@
-import { BaseEdge, getStraightPath, type EdgeProps } from '@xyflow/react'
+import { BaseEdge, type EdgeProps } from '@xyflow/react'
 import React from 'react'
 
 import { useWorkflow } from '../../context/WorkflowContext'
@@ -36,41 +36,38 @@ export const ApStraightLineEdge = ({
   targetX,
   targetY,
   data,
+  source,
 }: EdgeProps & Omit<ApStraightLineEdgeType, 'id' | 'source' | 'target' | 'type'>) => {
   const { openStepSelectorForStep } = useWorkflow()
 
-  // Use React Flow's getStraightPath for proper straight line rendering
-  const [edgePath] = getStraightPath({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-  })
-
-  // Calculate middle point for add button
-  const midX = sourceX + (targetX - sourceX) / 2
-  const midY = sourceY + (targetY - sourceY) / 2
+  const lineStartX = sourceX
+  const lineStartY = sourceY + flowConstants.VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
+  const lineLength = targetY - sourceY - 2 * flowConstants.VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
+  const path = `M ${lineStartX} ${lineStartY} v${lineLength} ${data.drawArrowHead ? flowConstants.ARROW_DOWN : ''}`
 
   const handleAddStep = () => {
-    // Open step selector popup at the button location
     openStepSelectorForStep(data.parentStepName, {
-      x: midX,
-      y: midY,
+      x: lineStartX,
+      y: lineStartY + (targetY - sourceY) / 2,
     })
   }
 
   return (
     <>
       <BaseEdge
-        path={edgePath}
-        style={{
-          strokeWidth: `${flowConstants.LINE_WIDTH}px`,
-          stroke: '#6b7280',
+        path={path}
+        style={{ 
+          strokeWidth: `${flowConstants.LINE_WIDTH}px`
         }}
       />
 
-      {/* Add button in the middle of the edge (if not hidden) */}
-      {!data.hideAddButton && <AddButton x={midX} y={midY} onAddStep={handleAddStep} />}
+      {!data.hideAddButton && (
+        <AddButton 
+          x={lineStartX} 
+          y={lineStartY + (targetY - sourceY) / 2 - flowConstants.AP_NODE_SIZE.ADD_BUTTON.height}
+          onAddStep={handleAddStep} 
+        />
+      )}
     </>
   )
 }
