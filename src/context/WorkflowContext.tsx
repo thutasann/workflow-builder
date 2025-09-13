@@ -179,9 +179,21 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         if (step.name === stepName) {
           return { ...step, ...updates }
         }
+        
+        // Recursively search in nextAction
         if ('nextAction' in step && step.nextAction) {
           return { ...step, nextAction: updateStepRecursive(step.nextAction) as FlowAction }
         }
+        
+        // Recursively search in router branches
+        if (step.type === FlowActionType.ROUTER) {
+          const routerStep = step as RouterAction
+          const newChildren = routerStep.children.map((child) => 
+            child ? updateStepRecursive(child) as FlowAction : child
+          )
+          return { ...routerStep, children: newChildren } as RouterAction
+        }
+        
         return step
       }
 

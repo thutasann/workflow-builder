@@ -26,6 +26,7 @@ import { ApRouterEndEdge } from './edges/ApRouterEndEdge'
 import { CustomEdge } from './edges/CustomEdge'
 import { StepSelectorHandler } from './StepSelectorHandler'
 import { WorkflowHeader } from './WorkflowHeader'
+import { RightPanel } from './RightPanel'
 
 // ActivePieces-style node and edge types
 const apNodeTypes = {
@@ -97,6 +98,7 @@ const WorkflowCanvasContent: React.FC = () => {
     <div style={{ width: '100%', height: '100vh', background: '#fafafa', position: 'relative' }}>
       <WorkflowHeader />
       <StepSelectorHandler />
+      <RightPanel />
       <ReactFlow
         nodes={nodes}
         edges={edges}
