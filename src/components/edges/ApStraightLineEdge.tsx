@@ -15,7 +15,7 @@ const AddButton: React.FC<AddButtonProps> = ({ x, y, onAddStep }) => {
   return (
     <foreignObject
       x={x - flowConstants.AP_NODE_SIZE.ADD_BUTTON.width / 2}
-      y={y - flowConstants.AP_NODE_SIZE.ADD_BUTTON.height / 2}
+      y={y - flowConstants.AP_NODE_SIZE.ADD_BUTTON.height / 2 + 5}
       width={flowConstants.AP_NODE_SIZE.ADD_BUTTON.width}
       height={flowConstants.AP_NODE_SIZE.ADD_BUTTON.height}
       className='overflow-visible'
@@ -33,10 +33,8 @@ const AddButton: React.FC<AddButtonProps> = ({ x, y, onAddStep }) => {
 export const ApStraightLineEdge = ({
   sourceX,
   sourceY,
-  targetX,
   targetY,
   data,
-  source,
 }: EdgeProps & Omit<ApStraightLineEdgeType, 'id' | 'source' | 'target' | 'type'>) => {
   const { openStepSelectorForStep } = useWorkflow()
 
@@ -56,18 +54,12 @@ export const ApStraightLineEdge = ({
     <>
       <BaseEdge
         path={path}
-        style={{ 
-          strokeWidth: `${flowConstants.LINE_WIDTH}px`
+        style={{
+          strokeWidth: `${flowConstants.LINE_WIDTH}px`,
         }}
       />
 
-      {!data.hideAddButton && (
-        <AddButton 
-          x={lineStartX} 
-          y={lineStartY + (targetY - sourceY) / 2 - flowConstants.AP_NODE_SIZE.ADD_BUTTON.height}
-          onAddStep={handleAddStep} 
-        />
-      )}
+      {!data.hideAddButton && <AddButton x={lineStartX} y={lineStartY + lineLength / 2} onAddStep={handleAddStep} />}
     </>
   )
 }
