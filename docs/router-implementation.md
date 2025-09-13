@@ -82,7 +82,7 @@ const offsetRouterChildSteps = (childGraphs: ApGraph[]): ApGraph[] => {
   // 1. Calculate bounding boxes for all branches
   const childGraphsBoundingBoxes = childGraphs.map(calculateGraphBoundingBox)
   
-  // 2. Calculate total width including spacing
+  // 2. Calculate total width including spacing (120px between branches)
   const totalWidth = 
     childGraphsBoundingBoxes.reduce((acc, current) => acc + current.width, 0) +
     HORIZONTAL_SPACE_BETWEEN_NODES * (childGraphs.length - 1)
@@ -161,7 +161,7 @@ Branch labels are embedded within the router start edges as foreignObject elemen
 Key spacing constants from ActivePieces:
 
 ```typescript
-const HORIZONTAL_SPACE_BETWEEN_NODES = 80 // Space between branches
+const HORIZONTAL_SPACE_BETWEEN_NODES = 120 // Space between branches (increased from 80px for better visual separation)
 const VERTICAL_SPACE_BETWEEN_STEPS = 85   // Space between sequential steps
 const ARC_LENGTH = 15                     // Radius for curved edges
 const LABEL_HEIGHT = 30                   // Branch label height
@@ -217,6 +217,69 @@ const createBigAddButtonGraph = (parentStep, nodeData) => {
 - Stroke color: #b1b1b7 (light gray)
 - No fill, just stroke
 
+## Adding Nodes to Branches
+
+### Branch Node Addition Flow
+
+When adding nodes to router branches, the system follows this flow:
+
+1. **BigAddButton Interaction**
+   - Each empty branch displays a BigAddButton component
+   - Clicking the button opens the step selector with branch context
+
+```typescript
+// ApBigAddButtonNode.tsx
+const handleClick = () => {
+  openStepSelectorForStep(
+    data.parentStepName,
+    { x: positionAbsoluteX + width/2, y: positionAbsoluteY + height/2 },
+    data.branchIndex // Pass branch index for context
+  )
+}
+```
+
+2. **WorkflowContext Branch Handling**
+   - The `addAction` method detects router branches and updates the correct child
+
+```typescript
+// WorkflowContext.tsx
+const addAction = (parentStepName: string, action: FlowAction, branchIndex?: number) => {
+  // If adding to a router branch
+  if (step.type === FlowActionType.ROUTER && branchIndex !== undefined) {
+    const routerStep = step as RouterAction
+    const newChildren = [...routerStep.children]
+    newChildren[branchIndex] = action // Add to specific branch
+    return { ...routerStep, children: newChildren } as RouterAction
+  }
+  // Otherwise add as nextAction
+  return { ...step, nextAction: action }
+}
+```
+
+3. **Automatic Layout**
+   - New nodes are automatically positioned within their branch
+   - The graph building process handles spacing and alignment
+   - Branches expand horizontally to accommodate content
+
+### Branch Structure
+
+Each router maintains an array of children:
+
+```typescript
+interface RouterAction {
+  children: (FlowAction | undefined)[]
+  // children[0] = Branch 1 content
+  // children[1] = Otherwise branch content
+}
+```
+
+### Nested Routers
+
+Routers can be nested within branches:
+- Each branch can contain any type of action, including other routers
+- The graph building recursively handles nested structures
+- Layout algorithm maintains proper spacing at all levels
+
 ## Usage Example
 
 To add a router to your workflow:
@@ -226,8 +289,15 @@ To add a router to your workflow:
 3. The router is created with 2 branches by default:
    - Branch 1 (conditional)
    - Otherwise (fallback)
-4. Click the + buttons in each branch to add steps
-5. Configure branch conditions in the settings panel
+4. Click the + buttons in each branch to add steps:
+   - Click the large + button in an empty branch
+   - Select any action type from the step selector
+   - The node is added to that specific branch
+5. Continue adding nodes to build branch logic:
+   - Add sequential steps within a branch
+   - Add nested routers for complex conditions
+   - Each branch maintains its own flow
+6. Configure branch conditions in the settings panel
 
 ## Key Files
 
