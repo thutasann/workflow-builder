@@ -11,8 +11,8 @@ export enum ApNodeType {
 // ActivePieces-inspired Edge Types
 export enum ApEdgeType {
   STRAIGHT_LINE = 'straightLine',
-  LOOP_START_EDGE = 'loopStart',
-  LOOP_RETURN_EDGE = 'loopReturn',
+  LOOP_START_EDGE = 'loopStartEdge',
+  LOOP_RETURN_EDGE = 'loopReturnEdge',
   ROUTER_START_EDGE = 'routerStartEdge',
   ROUTER_END_EDGE = 'routerEndEdge',
 }
@@ -61,6 +61,9 @@ export interface FlowAction {
 
 export interface LoopOnItemsAction extends FlowAction {
   type: FlowActionType.LOOP_ON_ITEMS
+  settings: {
+    items: string // Expression that evaluates to an array
+  }
   firstLoopAction?: FlowAction
 }
 
@@ -160,7 +163,30 @@ export interface ApRouterEndEdge {
   }
 }
 
-export type ApEdge = ApStraightLineEdge | ApRouterStartEdge | ApRouterEndEdge
+export interface ApLoopStartEdge {
+  id: string
+  source: string
+  target: string
+  type: ApEdgeType.LOOP_START_EDGE
+  data: {
+    isLoopEmpty: boolean
+  }
+}
+
+export interface ApLoopReturnEdge {
+  id: string
+  source: string
+  target: string
+  type: ApEdgeType.LOOP_RETURN_EDGE
+  data: {
+    parentStepName: string
+    isLoopEmpty: boolean
+    drawArrowHeadAfterEnd: boolean
+    verticalSpaceBetweenReturnNodeStartAndEnd: number
+  }
+}
+
+export type ApEdge = ApStraightLineEdge | ApRouterStartEdge | ApRouterEndEdge | ApLoopStartEdge | ApLoopReturnEdge
 
 // Button Data for Add Buttons
 export interface ApButtonData {

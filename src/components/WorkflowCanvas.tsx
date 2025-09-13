@@ -19,10 +19,13 @@ import { ApStraightLineEdge } from './edges/ApStraightLineEdge'
 import { ApBigAddButtonNode } from './nodes/ApBigAddButtonNode'
 import { ApGraphEndNode } from './nodes/ApGraphEndNode'
 import { ApStepNode } from './nodes/ApStepNode'
+import { ApLoopReturnNode } from './nodes/ApLoopReturnNode'
 
 // Edge components
 import { ApRouterStartEdge } from './edges/ApRouterStartEdge'
 import { ApRouterEndEdge } from './edges/ApRouterEndEdge'
+import { ApLoopStartEdge } from './edges/ApLoopStartEdge'
+import { ApLoopReturnEdge } from './edges/ApLoopReturnEdge'
 import { CustomEdge } from './edges/CustomEdge'
 import { StepSelectorHandler } from './StepSelectorHandler'
 import { WorkflowHeader } from './WorkflowHeader'
@@ -33,12 +36,15 @@ const apNodeTypes = {
   [ApNodeType.STEP]: ApStepNode,
   [ApNodeType.BIG_ADD_BUTTON]: ApBigAddButtonNode,
   [ApNodeType.GRAPH_END_WIDGET]: ApGraphEndNode,
+  [ApNodeType.LOOP_RETURN_NODE]: ApLoopReturnNode,
 }
 
 const apEdgeTypes = {
   [ApEdgeType.STRAIGHT_LINE]: ApStraightLineEdge,
   [ApEdgeType.ROUTER_START_EDGE]: ApRouterStartEdge,
   [ApEdgeType.ROUTER_END_EDGE]: ApRouterEndEdge,
+  [ApEdgeType.LOOP_START_EDGE]: ApLoopStartEdge,
+  [ApEdgeType.LOOP_RETURN_EDGE]: ApLoopReturnEdge,
   custom: CustomEdge,
 }
 

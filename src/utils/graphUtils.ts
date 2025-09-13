@@ -11,6 +11,7 @@ import {
   type ApBigAddButtonNode,
   type ApButtonData,
   type ApEdge,
+  type ApLoopReturnNode,
   ApNodeType,
   ApEdgeType,
   FlowActionType,
@@ -262,6 +263,102 @@ const buildRouterChildGraph = (step: RouterAction): ApGraph => {
   }
 }
 
+// Build loop child graph
+const buildLoopChildGraph = (step: LoopOnItemsAction): ApGraph => {
+  const childGraph = step.firstLoopAction
+    ? buildGraph(step.firstLoopAction)
+    : createBigAddButtonGraph(step, {
+        parentStepName: step.name,
+        stepLocationRelativeToParent: StepLocationRelativeToParent.INSIDE_LOOP,
+        edgeId: `${step.name}-loop-start-edge`,
+      })
+
+  const childGraphBoundingBox = calculateGraphBoundingBox(childGraph)
+  
+  // Calculate deltaLeftX as in ActivePieces
+  const deltaLeftX =
+    -(
+      childGraphBoundingBox.width +
+      flowConstants.AP_NODE_SIZE.step.width +
+      flowConstants.HORIZONTAL_SPACE_BETWEEN_NODES -
+      flowConstants.AP_NODE_SIZE.step.width / 2 -
+      childGraphBoundingBox.right
+    ) /
+      2 -
+    flowConstants.AP_NODE_SIZE.step.width / 2
+
+  // Offset the child graph to the right for loop positioning
+  const childGraphAfterOffset = offsetGraph(childGraph, {
+    x:
+      deltaLeftX +
+      flowConstants.AP_NODE_SIZE.step.width +
+      flowConstants.HORIZONTAL_SPACE_BETWEEN_NODES +
+      childGraphBoundingBox.left,
+    y:
+      flowConstants.VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD +
+      flowConstants.AP_NODE_SIZE.step.height,
+  })
+  
+  // Create loop return node
+  const loopReturnNode: ApLoopReturnNode = {
+    id: `${step.name}-loop-return-node`,
+    type: ApNodeType.LOOP_RETURN_NODE,
+    position: {
+      x: deltaLeftX + flowConstants.AP_NODE_SIZE.step.width / 2,
+      y:
+        flowConstants.AP_NODE_SIZE.step.height +
+        flowConstants.VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD +
+        childGraphBoundingBox.height / 2,
+    },
+    data: {},
+    selectable: false,
+  }
+
+  // Create the subgraph end node for the loop
+  const subgraphEndNode: ApGraphEndNode = {
+    id: `${step.name}-loop-subgraph-end`,
+    type: ApNodeType.GRAPH_END_WIDGET,
+    position: {
+      x: flowConstants.AP_NODE_SIZE.step.width / 2,
+      y: loopReturnNode.position.y + flowConstants.VERTICAL_SPACE_BETWEEN_STEPS,
+    },
+    data: {},
+    selectable: false,
+  }
+
+  // Create loop start edge
+  const loopStartEdge: ApEdge = {
+    id: `${step.name}-loop-start-edge`,
+    source: step.name,
+    target: childGraphAfterOffset.nodes[0].id,
+    type: ApEdgeType.LOOP_START_EDGE,
+    data: {
+      isLoopEmpty: !step.firstLoopAction,
+    },
+  }
+
+  // Create loop return edge
+  const lastChildNode = childGraphAfterOffset.nodes[childGraphAfterOffset.nodes.length - 1]
+  const loopReturnEdge: ApEdge = {
+    id: `${step.name}-loop-return-node`,
+    source: lastChildNode.id,
+    target: loopReturnNode.id,
+    type: ApEdgeType.LOOP_RETURN_EDGE,
+    data: {
+      parentStepName: step.name,
+      isLoopEmpty: !step.firstLoopAction,
+      drawArrowHeadAfterEnd: !step.nextAction,
+      verticalSpaceBetweenReturnNodeStartAndEnd: 
+        childGraphBoundingBox.height + flowConstants.VERTICAL_SPACE_BETWEEN_STEPS,
+    },
+  }
+
+  return {
+    nodes: [...childGraphAfterOffset.nodes, loopReturnNode, subgraphEndNode],
+    edges: [...childGraphAfterOffset.edges, loopStartEdge, loopReturnEdge],
+  }
+}
+
 // ActivePieces branch positioning algorithm
 const offsetRouterChildSteps = (childGraphs: ApGraph[]): ApGraph[] => {
   const childGraphsBoundingBoxes = childGraphs.map((childGraph) => calculateGraphBoundingBox(childGraph))
@@ -314,7 +411,7 @@ export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph 
 
   const childGraph =
     step.type === FlowActionType.LOOP_ON_ITEMS
-      ? null // TODO: implement loop child graph
+      ? buildLoopChildGraph(step as LoopOnItemsAction)
       : step.type === FlowActionType.ROUTER
         ? buildRouterChildGraph(step as RouterAction)
         : null
@@ -338,7 +435,20 @@ export const buildGraph = (step: FlowAction | FlowTrigger | undefined): ApGraph 
           parentStepName: step.name,
         },
       })
-    } else if (step.type !== FlowActionType.LOOP_ON_ITEMS) {
+    } else if (step.type === FlowActionType.LOOP_ON_ITEMS) {
+      // For loops, connect the subgraph end to the next step
+      const loopEndNodeId = `${step.name}-loop-subgraph-end`
+      interStepEdges.push({
+        id: `${loopEndNodeId}-${step.nextAction.name}-edge`,
+        source: loopEndNodeId,
+        target: step.nextAction.name,
+        type: ApEdgeType.STRAIGHT_LINE,
+        data: {
+          drawArrowHead: false,
+          parentStepName: step.name,
+        },
+      })
+    } else {
       // For normal steps, connect directly
       interStepEdges.push(createInterStepEdge(step, step.nextAction))
     }

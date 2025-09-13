@@ -17,6 +17,9 @@ export const StepSelectorHandler: React.FC = () => {
       case 'router':
         actionType = FlowActionType.ROUTER
         break
+      case 'loop':
+        actionType = FlowActionType.LOOP_ON_ITEMS
+        break
       case 'code':
       case 'http':
         actionType = FlowActionType.CODE
@@ -43,6 +46,17 @@ export const StepSelectorHandler: React.FC = () => {
           ]
         },
         children: [undefined, undefined] // 1 condition + 1 otherwise
+      }
+    }
+
+    // For loops, add the firstLoopAction
+    if (actionType === FlowActionType.LOOP_ON_ITEMS) {
+      newAction = {
+        ...newAction,
+        settings: {
+          items: '' // Empty expression initially
+        },
+        firstLoopAction: undefined
       }
     }
 

@@ -70,6 +70,14 @@ const stepOptions: StepOption[] = [
     category: 'Highlights',
     description: 'Route to multiple branches',
   },
+  {
+    id: 'loop',
+    type: FlowActionType.LOOP_ON_ITEMS,
+    label: 'Loop',
+    icon: '🔁',
+    category: 'Highlights',
+    description: 'Loop over items in an array',
+  },
   { id: 'http', type: FlowActionType.CODE, label: 'HTTP', icon: '🌐', category: 'Highlights', description: 'Make HTTP requests' },
   { id: 'code', type: FlowActionType.CODE, label: 'Code', icon: '💻', category: 'Highlights', description: 'Run custom code' },
   {

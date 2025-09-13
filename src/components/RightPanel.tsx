@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { useWorkflow } from '../context/WorkflowContext'
 import { FlowActionType } from '../types/workflow.types'
 import { RouterSettings } from './settings/RouterSettings'
+import { LoopSettings } from './settings/LoopSettings'
 
 export const RightPanel: React.FC = () => {
   const { selectedStep, flowVersion, selectStep } = useWorkflow()
@@ -59,6 +60,8 @@ export const RightPanel: React.FC = () => {
       <div className="p-4 overflow-y-auto h-[calc(100%-73px)]">
         {step.type === FlowActionType.ROUTER ? (
           <RouterSettings step={step} />
+        ) : step.type === FlowActionType.LOOP_ON_ITEMS ? (
+          <LoopSettings step={step} />
         ) : (
           <div className="text-gray-500">
             Settings for {step.displayName} will be implemented here

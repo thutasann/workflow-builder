@@ -5,6 +5,7 @@ import type {
   FlowAction,
   ApGraph,
   RouterAction,
+  LoopOnItemsAction,
 } from '../types/workflow.types'
 import { FlowTriggerType, FlowActionType } from '../types/workflow.types'
 import { convertFlowVersionToGraph } from '../utils/graphUtils'
@@ -138,6 +139,11 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
             newChildren[branchIndex] = action
             return { ...routerStep, children: newChildren } as RouterAction
           }
+          // If it's a loop, add as firstLoopAction
+          if (step.type === FlowActionType.LOOP_ON_ITEMS) {
+            const loopStep = step as LoopOnItemsAction
+            return { ...loopStep, firstLoopAction: action } as LoopOnItemsAction
+          }
           // Otherwise add as nextAction
           return { ...step, nextAction: action }
         }
@@ -154,6 +160,14 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
             child ? updateStep(child) as FlowAction : child
           )
           return { ...routerStep, children: newChildren } as RouterAction
+        }
+        
+        // Recursively search in loop
+        if (step.type === FlowActionType.LOOP_ON_ITEMS) {
+          const loopStep = step as LoopOnItemsAction
+          if (loopStep.firstLoopAction) {
+            return { ...loopStep, firstLoopAction: updateStep(loopStep.firstLoopAction) as FlowAction } as LoopOnItemsAction
+          }
         }
         
         return step
@@ -192,6 +206,15 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
             child ? updateStepRecursive(child) as FlowAction : child
           )
           return { ...routerStep, children: newChildren } as RouterAction
+        }
+        
+        // Recursively search in loop
+        if (step.type === FlowActionType.LOOP_ON_ITEMS) {
+          const loopStep = step as LoopOnItemsAction
+          const updatedFirstLoopAction = loopStep.firstLoopAction 
+            ? updateStepRecursive(loopStep.firstLoopAction) as FlowAction
+            : undefined
+          return { ...loopStep, firstLoopAction: updatedFirstLoopAction } as LoopOnItemsAction
         }
         
         return step
