@@ -18,18 +18,18 @@ import { convertApGraphToReactFlow } from '../utils/reactFlowConverter'
 import { ApStraightLineEdge } from './edges/ApStraightLineEdge'
 import { ApBigAddButtonNode } from './nodes/ApBigAddButtonNode'
 import { ApGraphEndNode } from './nodes/ApGraphEndNode'
-import { ApStepNode } from './nodes/ApStepNode'
 import { ApLoopReturnNode } from './nodes/ApLoopReturnNode'
+import { ApStepNode } from './nodes/ApStepNode'
 
 // Edge components
-import { ApRouterStartEdge } from './edges/ApRouterStartEdge'
-import { ApRouterEndEdge } from './edges/ApRouterEndEdge'
-import { ApLoopStartEdge } from './edges/ApLoopStartEdge'
 import { ApLoopReturnEdge } from './edges/ApLoopReturnEdge'
+import { ApLoopStartEdge } from './edges/ApLoopStartEdge'
+import { ApRouterEndEdge } from './edges/ApRouterEndEdge'
+import { ApRouterStartEdge } from './edges/ApRouterStartEdge'
 import { CustomEdge } from './edges/CustomEdge'
+import { RightPanel } from './RightPanel'
 import { StepSelectorHandler } from './StepSelectorHandler'
 import { WorkflowHeader } from './WorkflowHeader'
-import { RightPanel } from './RightPanel'
 
 // ActivePieces-style node and edge types
 const apNodeTypes = {
@@ -54,9 +54,16 @@ const WorkflowCanvasContent: React.FC = () => {
   // Convert our graph to React Flow format (memoized to prevent infinite loops)
   const { nodes, edges } = useMemo(() => {
     try {
-      return convertApGraphToReactFlow(graph)
+      const result = convertApGraphToReactFlow(graph)
+
+      console.group('%c🚀 React Flow Conversion Result', 'color: #4CAF50; font-weight: bold;')
+      console.log('%c🟦 Nodes:', 'color: #2196F3; font-weight: bold;', result.nodes)
+      console.log('%c🟥 Edges:', 'color: #F44336; font-weight: bold;', result.edges)
+      console.groupEnd()
+
+      return result
     } catch (error) {
-      console.error('Failed to convert graph to React Flow format:', error)
+      console.error('❌ Failed to convert graph to React Flow format:', error)
       return { nodes: [], edges: [] }
     }
   }, [graph])
@@ -74,7 +81,7 @@ const WorkflowCanvasContent: React.FC = () => {
       setSelectedNode(node.id)
       setSelectedEdge(null)
     },
-    [selectStep, setSelectedNode, setSelectedEdge],
+    [selectStep, setSelectedNode, setSelectedEdge]
   )
 
   const onEdgeClick = useCallback(
@@ -82,7 +89,7 @@ const WorkflowCanvasContent: React.FC = () => {
       setSelectedEdge(edge.id)
       setSelectedNode(null)
     },
-    [setSelectedNode, setSelectedEdge],
+    [setSelectedNode, setSelectedEdge]
   )
 
   const onPaneClick = useCallback(() => {
