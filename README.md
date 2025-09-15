@@ -1,4 +1,4 @@
-# React Workflow Builder
+# A Visual Workflow Builder
 
 A visual workflow automation builder inspired by ActivePieces, built with React, TypeScript, and React Flow (@xyflow/react).
 
@@ -101,7 +101,7 @@ function MyWorkflow() {
         actionName: 'send-email',
       },
     }
-    
+
     // Add after the trigger
     addAction('trigger', newAction)
   }
