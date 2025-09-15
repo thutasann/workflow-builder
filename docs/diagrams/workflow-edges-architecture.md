@@ -74,7 +74,7 @@ sequenceDiagram
     participant Otherwise
     participant Loop
     participant LoopBody
-    participant End
+    participant EndNode
 
     Trigger->>Action1: StraightLineEdge
     Action1->>Router: StraightLineEdge
@@ -82,12 +82,12 @@ sequenceDiagram
     Router->>Branch1: RouterStartEdge (label: "Branch 1")
     Router->>Otherwise: RouterStartEdge (label: "Otherwise")
     
-    Branch1->>End: RouterEndEdge
+    Branch1->>EndNode: RouterEndEdge
     Otherwise->>Loop: StraightLineEdge
     
     Loop->>LoopBody: LoopStartEdge
     LoopBody->>Loop: LoopReturnEdge
-    Loop->>End: StraightLineEdge (isAfterLoop: true)
+    Loop->>EndNode: StraightLineEdge (isAfterLoop: true)
 ```
 
 ## Edge Rendering Sequence
