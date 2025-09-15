@@ -96,9 +96,9 @@ graph TB
 classDiagram
     class ApStepNode {
         +id: string
-        +type: "step"
-        +position: {x, y}
-        +data: {step: FlowAction|FlowTrigger}
+        +type: step
+        +position: Position
+        +data: StepData
         +selectable: boolean
         +draggable: boolean
     }
@@ -107,41 +107,41 @@ classDiagram
         +name: string
         +displayName: string
         +type: FlowActionType
-        +settings: Record~string, any~
-        +nextAction?: FlowAction
+        +settings: Record
+        +nextAction: FlowAction
     }
 
     class RouterAction {
-        +children: FlowAction[]
-        +settings: {branches: Branch[]}
+        +children: FlowActionArray
+        +settings: RouterSettings
     }
 
     class LoopOnItemsAction {
-        +firstLoopAction?: FlowAction
-        +settings: {items: string}
+        +firstLoopAction: FlowAction
+        +settings: LoopSettings
     }
 
     class ApBigAddButtonNode {
         +id: string
-        +type: "bigAddButton"
-        +position: {x, y}
+        +type: bigAddButton
+        +position: Position
         +data: ApButtonData
         +selectable: false
     }
 
     class ApGraphEndNode {
         +id: string
-        +type: "graphEndWidget"
-        +position: {x, y}
-        +data: {showWidget?: boolean}
+        +type: graphEndWidget
+        +position: Position
+        +data: EndNodeData
         +selectable: false
     }
 
     class ApLoopReturnNode {
         +id: string
-        +type: "loopReturnNode"
-        +position: {x, y}
-        +data: {}
+        +type: loopReturnNode
+        +position: Position
+        +data: EmptyObject
         +selectable: false
     }
 
