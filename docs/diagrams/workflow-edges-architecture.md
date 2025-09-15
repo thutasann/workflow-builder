@@ -1,402 +1,310 @@
-# Workflow Edges Architecture - PlantUML Diagrams
+# Workflow Edges Architecture
 
 ## Overview
-This document contains PlantUML diagrams illustrating the edge types and their behaviors in the workflow builder system.
+This document illustrates the edge types and their behaviors in the workflow builder system using Mermaid diagrams.
 
 ## Edge Types Class Hierarchy
 
-```plantuml
-@startuml
-!theme plain
-title Edge Types Hierarchy
-
-abstract class ApEdge {
-  +id: string
-  +source: string
-  +target: string
-  +type: ApEdgeType
-  +data: object
-}
-
-class ApStraightLineEdge {
-  +type: STRAIGHT_LINE
-  +data: {
-    drawArrowHead: boolean
-    hideAddButton?: boolean
-    parentStepName: string
-    isAfterLoop?: boolean
-  }
-}
-
-class ApRouterStartEdge {
-  +type: ROUTER_START_EDGE
-  +data: {
-    isBranchEmpty: boolean
-    label: string
-    branchIndex: number
-    stepLocationRelativeToParent: string
-    drawHorizontalLine: boolean
-    drawStartingVerticalLine: boolean
-  }
-}
-
-class ApRouterEndEdge {
-  +type: ROUTER_END_EDGE
-  +data: {
-    drawEndingVerticalLine: boolean
-    verticalSpaceBetweenLastNodeInBranchAndEndLine: number
-    drawHorizontalLine: boolean
-    routerOrBranchStepName: string
-    isNextStepEmpty: boolean
-  }
-}
-
-class ApLoopStartEdge {
-  +type: LOOP_START_EDGE
-  +data: {
-    isLoopEmpty: boolean
-  }
-}
-
-class ApLoopReturnEdge {
-  +type: LOOP_RETURN_EDGE
-  +data: {
-    parentStepName: string
-    isLoopEmpty: boolean
-    drawArrowHeadAfterEnd: boolean
-    verticalSpaceBetweenReturnNodeStartAndEnd: number
-  }
-}
-
-ApEdge <|-- ApStraightLineEdge
-ApEdge <|-- ApRouterStartEdge
-ApEdge <|-- ApRouterEndEdge
-ApEdge <|-- ApLoopStartEdge
-ApEdge <|-- ApLoopReturnEdge
-
-@enduml
+```mermaid
+classDiagram
+    class ApEdge {
+        <<abstract>>
+        +id: string
+        +source: string
+        +target: string
+        +type: ApEdgeType
+        +data: object
+    }
+    
+    class ApStraightLineEdge {
+        +type: STRAIGHT_LINE
+        +drawArrowHead: boolean
+        +hideAddButton: boolean
+        +parentStepName: string
+        +isAfterLoop: boolean
+    }
+    
+    class ApRouterStartEdge {
+        +type: ROUTER_START_EDGE
+        +isBranchEmpty: boolean
+        +label: string
+        +branchIndex: number
+        +stepLocationRelativeToParent: string
+        +drawHorizontalLine: boolean
+        +drawStartingVerticalLine: boolean
+    }
+    
+    class ApRouterEndEdge {
+        +type: ROUTER_END_EDGE
+        +drawEndingVerticalLine: boolean
+        +verticalSpaceBetweenLastNodeInBranchAndEndLine: number
+        +drawHorizontalLine: boolean
+        +routerOrBranchStepName: string
+        +isNextStepEmpty: boolean
+    }
+    
+    class ApLoopStartEdge {
+        +type: LOOP_START_EDGE
+        +isLoopEmpty: boolean
+    }
+    
+    class ApLoopReturnEdge {
+        +type: LOOP_RETURN_EDGE
+        +parentStepName: string
+        +isLoopEmpty: boolean
+        +drawArrowHeadAfterEnd: boolean
+        +verticalSpaceBetweenReturnNodeStartAndEnd: number
+    }
+    
+    ApEdge <|-- ApStraightLineEdge
+    ApEdge <|-- ApRouterStartEdge
+    ApEdge <|-- ApRouterEndEdge
+    ApEdge <|-- ApLoopStartEdge
+    ApEdge <|-- ApLoopReturnEdge
 ```
 
-## Edge Connection Patterns
+## Edge Connection Flow Sequence
 
-```plantuml
-@startuml
-!theme plain
-title Edge Connection Patterns
+```mermaid
+sequenceDiagram
+    participant Trigger
+    participant Action1
+    participant Router
+    participant Branch1
+    participant Otherwise
+    participant Loop
+    participant LoopBody
+    participant End
 
-package "Normal Flow" {
-  [Trigger] --> [Action 1] : StraightLineEdge
-  [Action 1] --> [Action 2] : StraightLineEdge
-  [Action 2] --> [End] : StraightLineEdge
-}
-
-package "Router Flow" {
-  [Router] --> [Branch 1] : RouterStartEdge\n(label: "Branch 1")
-  [Router] --> [Otherwise] : RouterStartEdge\n(label: "Otherwise")
-  [Branch 1] --> [Action A]
-  [Otherwise] --> [Action B]
-  [Action A] --> [Merge] : RouterEndEdge
-  [Action B] --> [Merge] : RouterEndEdge
-}
-
-package "Loop Flow" {
-  [Loop] --> [First Action] : LoopStartEdge
-  [First Action] --> [Next Action]
-  [Next Action] --> [Loop Return] : LoopReturnEdge
-  [Loop Return] ..> [Loop] : returns to
-  [Loop] --> [After Loop] : StraightLineEdge\n(isAfterLoop: true)
-}
-
-@enduml
+    Trigger->>Action1: StraightLineEdge
+    Action1->>Router: StraightLineEdge
+    
+    Router->>Branch1: RouterStartEdge (label: "Branch 1")
+    Router->>Otherwise: RouterStartEdge (label: "Otherwise")
+    
+    Branch1->>End: RouterEndEdge
+    Otherwise->>Loop: StraightLineEdge
+    
+    Loop->>LoopBody: LoopStartEdge
+    LoopBody->>Loop: LoopReturnEdge
+    Loop->>End: StraightLineEdge (isAfterLoop: true)
 ```
 
-## Edge Rendering Components
+## Edge Rendering Sequence
 
-```plantuml
-@startuml
-!theme plain
-title Edge Rendering Components
+```mermaid
+sequenceDiagram
+    participant Component as Edge Component
+    participant SVG as SVG Renderer
+    participant Path as Path Calculator
+    participant Button as Add Button
+    participant Style as Style Engine
 
-component ApStraightLineEdge {
-  card "Path Rendering" {
-    [Start Point] --> [End Point] : Vertical Line
-    note right: M x y v[length]
-  }
-  
-  card "Add Button" {
-    [Plus Button]
-    note right: Shows at midpoint\nunless hideAddButton=true
-  }
-  
-  card "Arrow Head" {
-    [Arrow]
-    note right: Shows if drawArrowHead=true
-  }
-}
-
-component ApRouterStartEdge {
-  card "Path Segments" {
-    [Vertical Start] --> [Arc Right Down]
-    [Arc Right Down] --> [Horizontal Line]
-    [Horizontal Line] --> [Arc Right]
-    [Arc Right] --> [Vertical End]
-  }
-  
-  card "Branch Label" {
-    [foreignObject]
-    note right: Contains branch name\n(Branch 1 or Otherwise)
-  }
-}
-
-component ApLoopReturnEdge {
-  card "Return Path" {
-    [Start] --> [Arc Left Down]
-    [Arc Left Down] --> [Horizontal Left]
-    [Horizontal Left] --> [Arc Right Up]
-    [Arc Right Up] --> [Vertical Up]
-  }
-  
-  card "Arrow Segment" {
-    [Horizontal Arrow]
-    note right: Right-pointing arrow\nin the middle
-  }
-}
-
-@enduml
+    Component->>Path: Request path calculation
+    Path->>Path: Calculate source position
+    Path->>Path: Add vertical offset
+    Path->>Path: Determine edge type
+    
+    alt StraightLine Edge
+        Path->>Path: Calculate vertical length
+        Path->>Path: Create M x y v[length]
+    else Router Start Edge
+        Path->>Path: Calculate branch offset
+        Path->>Path: Create curved path with arcs
+    else Loop Return Edge
+        Path->>Path: Calculate return distance
+        Path->>Path: Create two-segment path
+    end
+    
+    Path->>SVG: Return path string
+    Component->>Style: Apply styling
+    Style->>SVG: Set stroke, width, color
+    
+    Component->>Button: Check if add button needed
+    alt Show Add Button
+        Button->>Button: Calculate midpoint
+        Button->>SVG: Render foreignObject
+        Button->>SVG: Add click handler
+    end
+    
+    SVG->>Component: Return rendered edge
 ```
 
-## Edge State Machine
+## Edge Interaction State Sequence
 
-```plantuml
-@startuml
-!theme plain
-title Edge Interaction States
+```mermaid
+sequenceDiagram
+    participant User
+    participant Edge
+    participant AddButton
+    participant Selector
+    participant Workflow
 
-[*] --> Idle
-
-Idle --> Hovering : Mouse Enter
-Hovering --> ShowAddButton : Not Hidden
-Hovering --> Idle : Mouse Leave
-
-ShowAddButton --> ButtonHovered : Hover Button
-ButtonHovered --> Opening : Click
-ButtonHovered --> ShowAddButton : Leave Button
-
-Opening --> StepSelector : Open Selector
-StepSelector --> AddingNode : Select Node Type
-AddingNode --> Idle : Node Added
-
-state "Edge States" {
-  Idle : Default state
-  Hovering : Edge highlighted
-  ShowAddButton : Plus button visible
-  ButtonHovered : Button highlighted
-}
-
-state "Action States" {
-  Opening : Opening selector
-  StepSelector : Selector open
-  AddingNode : Creating node
-}
-
-@enduml
+    User->>Edge: Mouse enters edge area
+    Edge->>Edge: Change to hover state
+    Edge->>AddButton: Show add button
+    
+    User->>AddButton: Hover over button
+    AddButton->>AddButton: Highlight state
+    
+    User->>AddButton: Click button
+    AddButton->>Workflow: openStepSelectorForStep()
+    Workflow->>Selector: Show step selector
+    
+    User->>Selector: Select node type
+    Selector->>Workflow: addAction()
+    Workflow->>Workflow: Update flow structure
+    Workflow->>Edge: Re-render edges
+    
+    User->>Edge: Mouse leaves
+    Edge->>AddButton: Hide add button
+    Edge->>Edge: Return to idle state
 ```
 
-## Edge Path Calculations
+## Edge Data Flow for Adding Nodes
 
-```plantuml
-@startuml
-!theme plain
-title Edge Path Calculation Flow
+```mermaid
+sequenceDiagram
+    participant User
+    participant AddButton
+    participant StepSelector
+    participant WorkflowContext
+    participant GraphUtils
+    participant ReactFlow
 
-start
-
-:Calculate Source Position;
-note right: sourceX, sourceY from node
-
-:Add Vertical Offset;
-note right: sourceY + VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
-
-:Determine Edge Type;
-
-if (Edge Type?) then (StraightLine)
-  :Calculate Vertical Length;
-  :Create Simple Path;
-  :M x y v[length];
-elseif (RouterStart) then
-  :Calculate Branch Offset;
-  :Add Horizontal Spacing;
-  :Create Multi-segment Path;
-  :M x y v h arc v arrow;
-elseif (LoopReturn) then
-  :Calculate Return Distance;
-  :Create Complex Path;
-  :Two segments with arrow;
-else (LoopStart)
-  :Calculate Loop Offset;
-  :Create Curved Path;
-  :M x y v arc h arc v;
-endif
-
-:Apply Styling;
-note right: strokeWidth, color
-
-:Render SVG Path;
-
-if (Show Add Button?) then (yes)
-  :Calculate Button Position;
-  :Render Add Button;
-else (no)
-  :Skip Button;
-endif
-
-stop
-
-@enduml
+    User->>AddButton: Click Add Button
+    AddButton->>WorkflowContext: openStepSelectorForStep(parentStepName, position, branchIndex?, stepLocation?)
+    
+    WorkflowContext->>StepSelector: Show Selector
+    User->>StepSelector: Select Node Type
+    StepSelector->>WorkflowContext: addAction(parentStepName, newAction, branchIndex?, stepLocation?)
+    
+    alt Loop-subgraph-end + AFTER
+        WorkflowContext->>WorkflowContext: Extract Loop Name from ID
+        WorkflowContext->>WorkflowContext: Find loop step
+        WorkflowContext->>WorkflowContext: Add as nextAction
+    else Router branch
+        WorkflowContext->>WorkflowContext: Add to branch array
+    else Loop inside
+        WorkflowContext->>WorkflowContext: Add as firstLoopAction
+    else Normal
+        WorkflowContext->>WorkflowContext: Add as nextAction
+    end
+    
+    WorkflowContext->>GraphUtils: convertFlowVersionToGraph()
+    GraphUtils->>GraphUtils: buildGraph() recursively
+    GraphUtils->>GraphUtils: Create nodes
+    GraphUtils->>GraphUtils: Create edges
+    GraphUtils->>ReactFlow: Update Graph
+    
+    ReactFlow->>User: Display Updated Workflow
 ```
 
-## Edge Data Flow
+## Edge Path Calculation Sequence
 
-```plantuml
-@startuml
-!theme plain
-title Edge Data Flow and Updates
+```mermaid
+sequenceDiagram
+    participant EdgeComponent
+    participant PathCalc as Path Calculator
+    participant Constants
+    participant SVG
 
-actor User
-participant "Add Button" as AB
-participant "Step Selector" as SS
-participant "Workflow Context" as WC
-participant "Graph Utils" as GU
-participant "React Flow" as RF
-
-User -> AB: Click Add Button
-AB -> WC: openStepSelectorForStep(\n  parentStepName,\n  position,\n  branchIndex?,\n  stepLocation\n)
-
-WC -> SS: Show Selector
-User -> SS: Select Node Type
-SS -> WC: addAction(\n  parentStepName,\n  newAction,\n  branchIndex?,\n  stepLocation\n)
-
-WC -> WC: Determine Parent Type
-alt Loop-subgraph-end + AFTER
-  WC -> WC: Extract Loop Name
-  WC -> WC: Add as nextAction
-else Normal Parent
-  WC -> WC: Add to Parent
-end
-
-WC -> GU: convertFlowVersionToGraph()
-GU -> GU: buildGraph() recursively
-GU -> GU: Create new edges
-GU -> RF: Update Graph
-
-RF -> User: Display Updated Workflow
-
-@enduml
+    EdgeComponent->>PathCalc: Request path(sourceX, sourceY, targetY, edgeType)
+    
+    PathCalc->>Constants: Get VERTICAL_SPACE_BETWEEN_STEP_AND_LINE
+    Constants-->>PathCalc: Return 5px
+    
+    PathCalc->>PathCalc: lineStartY = sourceY + 5
+    
+    alt Straight Line Edge
+        PathCalc->>PathCalc: lineLength = targetY - sourceY - 10
+        PathCalc->>PathCalc: path = M sourceX lineStartY v lineLength
+    else Router Start Edge
+        PathCalc->>Constants: Get ARC_LENGTH
+        Constants-->>PathCalc: Return 25px
+        PathCalc->>PathCalc: Calculate curved segments
+        PathCalc->>PathCalc: path = M x y v25 q25,0 25,25 h100 q25,0 25,25 v50
+    else Loop Return Edge
+        PathCalc->>PathCalc: Calculate two-segment path
+        PathCalc->>PathCalc: Add horizontal arrow in middle
+    end
+    
+    PathCalc->>EdgeComponent: Return path string
+    EdgeComponent->>SVG: Render path element
+    SVG->>EdgeComponent: Edge rendered
 ```
 
-## Edge Positioning Constants
+## Edge Lifecycle Sequence
 
-```plantuml
-@startuml
-!theme plain
-title Edge Positioning Constants
+```mermaid
+sequenceDiagram
+    participant Flow as Flow Structure
+    participant GraphBuilder
+    participant EdgeFactory
+    participant ReactFlow
+    participant DOM
 
-package "Vertical Spacing" {
-  object VERTICAL_SPACE_BETWEEN_STEPS {
-    value = 100
-    usage = "Between sequential nodes"
-  }
-  
-  object VERTICAL_SPACE_BETWEEN_STEP_AND_LINE {
-    value = 5
-    usage = "Node to edge start"
-  }
-  
-  object VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD {
-    value = 157
-    usage = "Loop to first child"
-  }
-}
-
-package "Horizontal Spacing" {
-  object HORIZONTAL_SPACE_BETWEEN_NODES {
-    value = 120
-    usage = "Between branches/loops"
-  }
-}
-
-package "Arc Dimensions" {
-  object ARC_LENGTH {
-    value = 25
-    usage = "Curve radius"
-  }
-  
-  object LINE_WIDTH {
-    value = 2
-    usage = "Edge stroke width"
-  }
-}
-
-package "SVG Patterns" {
-  object ARROW_DOWN {
-    value = "l-5,10 m5,-10 l5,10"
-    usage = "Downward arrow"
-  }
-  
-  object ARC_RIGHT_DOWN {
-    value = "q25,0 25,25"
-    usage = "Right-down curve"
-  }
-}
-
-@enduml
+    Flow->>GraphBuilder: Node added/modified
+    GraphBuilder->>GraphBuilder: Analyze node type
+    
+    alt Has nextAction
+        GraphBuilder->>EdgeFactory: Create inter-step edge
+        alt Parent is Loop
+            EdgeFactory->>EdgeFactory: source = loop-subgraph-end
+            EdgeFactory->>EdgeFactory: isAfterLoop = true
+        else Parent is Router
+            EdgeFactory->>EdgeFactory: source = router-subgraph-end
+        else Normal
+            EdgeFactory->>EdgeFactory: source = parent.id
+        end
+    else No nextAction & Loop/Router
+        GraphBuilder->>EdgeFactory: Create edge to graph end
+    end
+    
+    EdgeFactory->>GraphBuilder: Return edge object
+    GraphBuilder->>ReactFlow: Add edge to graph
+    
+    ReactFlow->>DOM: Render edge component
+    DOM->>DOM: Attach event listeners
+    
+    loop While edge exists
+        DOM->>DOM: Handle mouse events
+        DOM->>DOM: Show/hide add button
+        DOM->>Flow: Handle add node clicks
+    end
+    
+    Flow->>GraphBuilder: Node removed
+    GraphBuilder->>ReactFlow: Remove edge
+    ReactFlow->>DOM: Unmount component
+    DOM->>DOM: Clean up listeners
 ```
 
-## Edge Lifecycle
+## Edge Types Summary
 
-```plantuml
-@startuml
-!theme plain
-title Edge Lifecycle
+| Edge Type | Connection Pattern | Visual Representation |
+|-----------|-------------------|----------------------|
+| **StraightLineEdge** | Sequential nodes | Vertical line with optional arrow |
+| **RouterStartEdge** | Router to branches | Curved path with branch label |
+| **RouterEndEdge** | Branches to merge | Curved merge path |
+| **LoopStartEdge** | Loop to first action | Right-curving path |
+| **LoopReturnEdge** | Last action to loop | Two-segment return path with arrow |
 
-|Graph Building|
-start
-:Node Added to Flow;
-:Determine Node Type;
+## Key Constants
 
-|Edge Creation|
-if (Has Next Action?) then (yes)
-  :Create Inter-step Edge;
-  if (Parent is Loop?) then (yes)
-    :Source = loop-subgraph-end;
-    :Mark isAfterLoop = true;
-  elseif (Parent is Router?) then (yes)
-    :Source = router-subgraph-end;
-  else (Normal)
-    :Source = parent node;
-  endif
-else (no)
-  if (Loop/Router?) then (yes)
-    :Create Edge to Graph End;
-  endif
-endif
-
-|Rendering|
-:Calculate Positions;
-:Generate SVG Path;
-:Add Interactive Elements;
-
-|Interaction|
-repeat
-  :Listen for Events;
-  :Show/Hide Add Button;
-  :Handle Clicks;
-repeat while (Edge Exists?) is (yes)
-
-|Cleanup|
-:Remove from DOM;
-:Clear Event Listeners;
-stop
-
-@enduml
+```mermaid
+graph TD
+    subgraph Vertical Spacing
+        VS1[VERTICAL_SPACE_BETWEEN_STEPS = 100px]
+        VS2[VERTICAL_SPACE_BETWEEN_STEP_AND_LINE = 5px]
+        VS3[VERTICAL_OFFSET_BETWEEN_LOOP_AND_CHILD = 157px]
+    end
+    
+    subgraph Horizontal Spacing
+        HS1[HORIZONTAL_SPACE_BETWEEN_NODES = 120px]
+    end
+    
+    subgraph Arc Dimensions
+        AD1[ARC_LENGTH = 25px]
+        AD2[LINE_WIDTH = 2px]
+    end
 ```
