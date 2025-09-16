@@ -1,0 +1,168 @@
+[
+  {
+    "id": "trigger",
+    "type": "step",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "data": {
+      "step": {
+        "name": "trigger",
+        "displayName": "Start",
+        "type": "EMPTY",
+        "settings": {},
+        "nextAction": {
+          "name": "step-1758018028986",
+          "displayName": "HTTP",
+          "type": "CODE",
+          "settings": {},
+          "nextAction": {
+            "name": "step-1758018031512",
+            "displayName": "HTTP",
+            "type": "CODE",
+            "settings": {},
+            "nextAction": {
+              "name": "step-1758018093712",
+              "displayName": "Tables",
+              "type": "PIECE",
+              "settings": {}
+            }
+          }
+        }
+      }
+    },
+    "selectable": false,
+    "draggable": true,
+    "style": {
+      "pointerEvents": "all"
+    }
+  },
+  {
+    "id": "trigger-subgraph-end",
+    "type": "graphEndWidget",
+    "position": {
+      "x": 130,
+      "y": 155
+    },
+    "data": {},
+    "selectable": false,
+    "draggable": false
+  },
+  {
+    "id": "step-1758018028986",
+    "type": "step",
+    "position": {
+      "x": 0,
+      "y": 155
+    },
+    "data": {
+      "step": {
+        "name": "step-1758018028986",
+        "displayName": "HTTP",
+        "type": "CODE",
+        "settings": {},
+        "nextAction": {
+          "name": "step-1758018031512",
+          "displayName": "HTTP",
+          "type": "CODE",
+          "settings": {},
+          "nextAction": {
+            "name": "step-1758018093712",
+            "displayName": "Tables",
+            "type": "PIECE",
+            "settings": {}
+          }
+        }
+      }
+    },
+    "selectable": true,
+    "draggable": true,
+    "style": {
+      "pointerEvents": "all"
+    }
+  },
+  {
+    "id": "step-1758018028986-subgraph-end",
+    "type": "graphEndWidget",
+    "position": {
+      "x": 130,
+      "y": 310
+    },
+    "data": {},
+    "selectable": false,
+    "draggable": false
+  },
+  {
+    "id": "step-1758018031512",
+    "type": "step",
+    "position": {
+      "x": 0,
+      "y": 310
+    },
+    "data": {
+      "step": {
+        "name": "step-1758018031512",
+        "displayName": "HTTP",
+        "type": "CODE",
+        "settings": {},
+        "nextAction": {
+          "name": "step-1758018093712",
+          "displayName": "Tables",
+          "type": "PIECE",
+          "settings": {}
+        }
+      }
+    },
+    "selectable": true,
+    "draggable": true,
+    "style": {
+      "pointerEvents": "all"
+    }
+  },
+  {
+    "id": "step-1758018031512-subgraph-end",
+    "type": "graphEndWidget",
+    "position": {
+      "x": 130,
+      "y": 465
+    },
+    "data": {},
+    "selectable": false,
+    "draggable": false
+  },
+  {
+    "id": "step-1758018093712",
+    "type": "step",
+    "position": {
+      "x": 0,
+      "y": 465
+    },
+    "data": {
+      "step": {
+        "name": "step-1758018093712",
+        "displayName": "Tables",
+        "type": "PIECE",
+        "settings": {}
+      }
+    },
+    "selectable": true,
+    "draggable": true,
+    "style": {
+      "pointerEvents": "all"
+    }
+  },
+  {
+    "id": "step-1758018093712-subgraph-end",
+    "type": "graphEndWidget",
+    "position": {
+      "x": 130,
+      "y": 620
+    },
+    "data": {
+      "showWidget": true
+    },
+    "selectable": false,
+    "draggable": false
+  }
+]

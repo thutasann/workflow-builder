@@ -1,0 +1,42 @@
+[
+  {
+    "id": "step-1758018093712-graph-end-edge",
+    "source": "step-1758018093712",
+    "target": "step-1758018093712-subgraph-end",
+    "type": "straightLine",
+    "data": {
+      "drawArrowHead": false,
+      "parentStepName": "step-1758018093712"
+    }
+  },
+  {
+    "id": "step-1758018031512-step-1758018093712-edge",
+    "source": "step-1758018031512",
+    "target": "step-1758018093712",
+    "type": "straightLine",
+    "data": {
+      "drawArrowHead": false,
+      "parentStepName": "step-1758018031512"
+    }
+  },
+  {
+    "id": "step-1758018028986-step-1758018031512-edge",
+    "source": "step-1758018028986",
+    "target": "step-1758018031512",
+    "type": "straightLine",
+    "data": {
+      "drawArrowHead": false,
+      "parentStepName": "step-1758018028986"
+    }
+  },
+  {
+    "id": "trigger-step-1758018028986-edge",
+    "source": "trigger",
+    "target": "step-1758018028986",
+    "type": "straightLine",
+    "data": {
+      "drawArrowHead": false,
+      "parentStepName": "trigger"
+    }
+  }
+]
