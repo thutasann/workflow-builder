@@ -26,7 +26,6 @@ import { ApLoopReturnEdge } from './edges/ApLoopReturnEdge'
 import { ApLoopStartEdge } from './edges/ApLoopStartEdge'
 import { ApRouterEndEdge } from './edges/ApRouterEndEdge'
 import { ApRouterStartEdge } from './edges/ApRouterStartEdge'
-import { CustomEdge } from './edges/CustomEdge'
 import { RightPanel } from './RightPanel'
 import { StepSelectorHandler } from './StepSelectorHandler'
 import { WorkflowHeader } from './WorkflowHeader'
@@ -45,7 +44,6 @@ const apEdgeTypes = {
   [ApEdgeType.ROUTER_END_EDGE]: ApRouterEndEdge,
   [ApEdgeType.LOOP_START_EDGE]: ApLoopStartEdge,
   [ApEdgeType.LOOP_RETURN_EDGE]: ApLoopReturnEdge,
-  custom: CustomEdge,
 }
 
 const WorkflowCanvasContent: React.FC = () => {

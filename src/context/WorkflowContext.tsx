@@ -59,7 +59,7 @@ interface WorkflowProviderProps {
 const createEmptyTrigger = (): FlowTrigger => ({
   name: 'trigger',
   displayName: 'Start',
-  type: FlowTriggerType.EMPTY,
+  type: FlowTriggerType.PIECE,
   settings: {},
 })
 
@@ -117,7 +117,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         branchIndex,
       })
     },
-    [],
+    []
   )
 
   const closeStepSelector = useCallback(() => {
@@ -206,7 +206,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         if (step.type === FlowActionType.ROUTER) {
           const routerStep = step as RouterAction
           const newChildren = routerStep.children.map((child) =>
-            child ? (updateStepRecursive(child) as FlowAction) : child,
+            child ? (updateStepRecursive(child) as FlowAction) : child
           )
           return { ...routerStep, children: newChildren } as RouterAction
         }
@@ -233,7 +233,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
   const deleteStep = useCallback((stepName: string) => {
     setFlowVersion((prev) => {
       const deleteStepRecursive = (
-        step: FlowAction | FlowTrigger | undefined,
+        step: FlowAction | FlowTrigger | undefined
       ): FlowAction | FlowTrigger | undefined => {
         if (!step) return undefined
 
@@ -252,7 +252,7 @@ export const WorkflowProvider: React.FC<WorkflowProviderProps> = ({ children }) 
         if (step.type === FlowActionType.ROUTER) {
           const routerStep = step as RouterAction
           const newChildren = routerStep.children.map((child) =>
-            child ? (deleteStepRecursive(child) as FlowAction) : child,
+            child ? (deleteStepRecursive(child) as FlowAction) : child
           )
           return { ...routerStep, children: newChildren } as RouterAction
         }
